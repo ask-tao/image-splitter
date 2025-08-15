@@ -6,15 +6,17 @@
     <el-container class="content-container">
       <el-main class="main-content">
         <el-card shadow="never" class="canvas-card">
-          <canvas 
-            ref="canvasRef" 
-            class="editor-canvas checkerboard-bg"
-            :style="{ cursor: cursorStyle }"
-            @mousedown="onMouseDown"
-            @mousemove="onMouseMove"
-            @mouseup="onMouseUp"
-            @mouseleave="onMouseLeave"
-          ></canvas>
+          <div class="canvas-wrapper">
+            <canvas 
+              ref="canvasRef" 
+              class="editor-canvas checkerboard-bg"
+              :style="{ cursor: cursorStyle }"
+              @mousedown="onMouseDown"
+              @mousemove="onMouseMove"
+              @mouseup="onMouseUp"
+              @mouseleave="onMouseLeave"
+            ></canvas>
+          </div>
           <div v-if="!sourceImage" class="canvas-placeholder">
             <p>请上传图片</p>
           </div>
@@ -740,7 +742,9 @@ html, body, #app, .app-container {
 
 .main-content {
   padding: 20px;
-  /* Removed display: flex, justify-content, align-items */
+  display: flex; /* Re-add flex */
+  justify-content: center; /* Re-add centering */
+  align-items: center; /* Re-add centering */
   flex: 1; /* Make it take available space */
   min-height: 0; /* Allow it to shrink if content is too big */
 }
@@ -751,15 +755,19 @@ html, body, #app, .app-container {
 
 .canvas-card {
   position: relative; /* For absolute positioning of placeholder */
-  width: calc(100% - 40px); /* Reduce width by 2 * margin */
-  height: calc(100% - 40px); /* Reduce height by 2 * margin */
-  margin: 20px; /* Add outer margin */
+  width: 100%;
+  height: 100%;
   overflow: auto;
-  display: flex; /* Re-enable flexbox */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  padding: 20px; /* Add padding to the scrollable area */
-  box-sizing: border-box; /* Include padding in width/height calculation */
+  /* Removed display: flex, justify-content, align-items, padding, box-sizing */
+}
+
+.canvas-wrapper {
+  margin: 20px; /* Outer margin */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: fit-content; /* Ensure it doesn't shrink */
+  min-height: fit-content; /* Ensure it doesn't shrink */
 }
 
 .canvas-placeholder {
@@ -784,8 +792,6 @@ html, body, #app, .app-container {
 
 .editor-canvas {
   border: 1px dashed #dcdfe6;
-  flex-shrink: 0; /* Prevent shrinking */
-  flex-grow: 0; /* Prevent growing */
 }
 
 .sidebar {
