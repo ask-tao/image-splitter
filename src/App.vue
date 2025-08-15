@@ -15,6 +15,9 @@
             @mouseup="onMouseUp"
             @mouseleave="onMouseLeave"
           ></canvas>
+          <div v-if="!sourceImage" class="canvas-placeholder">
+            <p>请上传图片</p>
+          </div>
         </el-card>
       </el-main>
       <el-aside width="350px" class="sidebar">
@@ -35,6 +38,9 @@
             </el-upload>
 
             <el-divider>操作</el-divider>
+            <el-form-item label-width="80px" label="画布边距">
+              <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
+            </el-form-item>
             <el-form-item label-width="auto" label="内边距">
               <el-input-number v-model="autoDetectPadding" :min="0" :max="50" controls-position="right" size="small" class="padding-input" />
             </el-form-item>
@@ -77,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import type { UploadFile } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
@@ -125,7 +131,20 @@ onUnmounted(() => {
 const ANCHOR_SIZE = 8;
 const ANCHOR_COLOR = '#FFFFFF';
 const ANCHOR_STROKE_COLOR = '#007bff';
-const CANVAS_PADDING = 20;
+
+const canvasPadding = ref(20); // Make canvas padding adjustable
+
+watch(canvasPadding, (newValue) => {
+  if (sourceImage.value) {
+    const canvas = canvasRef.value;
+    if (canvas) {
+      canvas.width = sourceImage.value.width + newValue * 2;
+      canvas.height = sourceImage.value.height + newValue * 2;
+      draw();
+      updatePreview();
+    }
+  }
+});
 
 const autoDetectPadding = ref(0);
 const exportPrefix = ref('sprite');
@@ -156,27 +175,27 @@ const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (sourceImage.value) {
-    ctx.drawImage(sourceImage.value, CANVAS_PADDING, CANVAS_PADDING);
-  }
+    ctx.drawImage(sourceImage.value, canvasPadding.value, canvasPadding.value);
 
-  boxes.value.forEach(box => {
-    const isSelected = box.id === selectedBoxId.value;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = isSelected ? '#007bff' : '#FF0000';
-    ctx.strokeRect(box.x, box.y, box.w, box.h);
+    boxes.value.forEach(box => {
+      const isSelected = box.id === selectedBoxId.value;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = isSelected ? '#007bff' : '#FF0000';
+      ctx.strokeRect(box.x, box.y, box.w, box.h);
 
-    if (isSelected) {
-      ctx.fillStyle = ANCHOR_COLOR;
-      ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-      ctx.lineWidth = 1;
-      const anchors = getAnchors(box);
-      for (const key in anchors) {
-        const anchor = anchors[key as keyof typeof anchors];
-        ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-        ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+      if (isSelected) {
+        ctx.fillStyle = ANCHOR_COLOR;
+        ctx.strokeStyle = ANCHOR_STROKE_COLOR;
+        ctx.lineWidth = 1;
+        const anchors = getAnchors(box);
+        for (const key in anchors) {
+          const anchor = anchors[key as keyof typeof anchors];
+          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 const updatePreview = () => {
@@ -214,7 +233,7 @@ const updatePreview = () => {
 
     previewCtx.drawImage(
       sourceImage.value,
-      selectedBox.x - CANVAS_PADDING, selectedBox.y - CANVAS_PADDING, selectedBox.w, selectedBox.h, // Source rect
+      selectedBox.x - canvasPadding.value, selectedBox.y - canvasPadding.value, selectedBox.w, selectedBox.h, // Source rect
       drawX, drawY, drawW, drawH // Destination rect (aspect-ratio corrected)
     );
   }
@@ -233,8 +252,8 @@ const handleFileChange = (uploadFile: UploadFile) => {
     if (!canvas) return;
 
     sourceImage.value = img;
-    canvas.width = img.width + CANVAS_PADDING * 2;
-    canvas.height = img.height + CANVAS_PADDING * 2;
+    canvas.width = img.width + canvasPadding.value * 2;
+    canvas.height = img.height + canvasPadding.value * 2;
     boxes.value = [];
     selectedBoxId.value = null;
     draw();
@@ -275,7 +294,7 @@ const originalAspectRatio = ref(1);
 
 const onMouseDown = (e: MouseEvent) => {
   e.preventDefault(); // Prevent default browser drag behavior
-  if (!canvasRef.value) return;
+  if (!canvasRef.value || !sourceImage.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
   startX.value = e.clientX - rect.left;
   startY.value = e.clientY - rect.top;
@@ -308,7 +327,7 @@ const onMouseDown = (e: MouseEvent) => {
 };
 
 const onMouseMove = (e: MouseEvent) => {
-  if (!canvasRef.value) return;
+  if (!canvasRef.value || !sourceImage.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
   const currentX = e.clientX - rect.left;
   const currentY = e.clientY - rect.top;
@@ -422,6 +441,7 @@ const onMouseMove = (e: MouseEvent) => {
 };
 
 const onMouseUp = () => {
+  if (!sourceImage.value) return;
   if (isResizing.value && selectedBoxId.value) {
     const selectedBox = boxes.value.find(b => b.id === selectedBoxId.value);
     if (selectedBox) {
@@ -446,13 +466,14 @@ const onMouseUp = () => {
 };
 
 const onMouseLeave = () => {
+  if (!sourceImage.value) return;
   if (isDrawing.value || isMoving.value) {
     onMouseUp();
   }
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (selectedBoxId.value === null) return;
+  if (!sourceImage.value || selectedBoxId.value === null) return;
 
   if (e.key === 'Delete' || e.key === 'Backspace') {
     e.preventDefault();
@@ -554,8 +575,8 @@ const handleAutoDetect = () => {
       const idealH = originalH + padding * 2;
 
       // Translate to canvas coordinates by adding the canvas padding. No image-boundary clipping.
-      const boxX = idealX + CANVAS_PADDING;
-      const boxY = idealY + CANVAS_PADDING;
+      const boxX = idealX + canvasPadding.value;
+      const boxY = idealY + canvasPadding.value;
       const boxW = idealW;
       const boxH = idealH;
 
@@ -588,7 +609,7 @@ const handleExport = async () => {
     if (!tempCtx) continue;
 
     // Define the image area on the main canvas
-    const imageRect = { x: CANVAS_PADDING, y: CANVAS_PADDING, w: img.width, h: img.height };
+    const imageRect = { x: canvasPadding.value, y: canvasPadding.value, w: img.width, h: img.height };
 
     // Find the intersection of the box and the image area
     const intersectX = Math.max(box.x, imageRect.x);
@@ -602,8 +623,8 @@ const handleExport = async () => {
     // Only draw if there is a valid intersection
     if (intersectW > 0 && intersectH > 0) {
       // Source coordinates are relative to the original image
-      const sourceX = intersectX - CANVAS_PADDING;
-      const sourceY = intersectY - CANVAS_PADDING;
+      const sourceX = intersectX - canvasPadding.value;
+      const sourceY = intersectY - canvasPadding.value;
 
       // Destination coordinates are relative to the temp canvas
       const destX = intersectX - box.x;
@@ -666,12 +687,33 @@ html, body, #app, .app-container {
 }
 
 .canvas-card {
+  position: relative; /* For absolute positioning of placeholder */
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: auto;
+}
+
+.canvas-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #909399;
+  font-size: 18px;
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white overlay */
+  z-index: 10; /* Ensure it's above canvas */
+}
+
+.canvas-placeholder p {
+  margin: 5px 0;
 }
 
 .editor-canvas {
