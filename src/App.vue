@@ -157,6 +157,7 @@ watch(canvasPadding, (newValue) => {
 watch(canvasZoom, (newValue) => {
   const canvas = canvasRef.value;
   const canvasCard = canvasCardRef.value; // Get reference to parent div
+  console.log('watch(canvasZoom) - canvasCardRef.value:', canvasCardRef.value); // DEBUG
   if (canvas && sourceImage.value && canvasCard) {
     // Calculate desired display size based on new zoom
     let desiredDisplayWidth = (sourceImage.value.width + canvasPadding.value * 2) * (newValue / 100);
@@ -298,7 +299,9 @@ const handleFileChange = (uploadFile: UploadFile) => {
 
     img.onload = () => {
       const canvas = canvasRef.value;
-      if (!canvas) return;
+      const canvasCard = canvasCardRef.value; // Get reference to parent div
+      console.log('handleFileChange - canvasCardRef.value:', canvasCardRef.value); // DEBUG
+      if (!canvas || !canvasCard) return;
 
       sourceImage.value = img;
       // Set canvas internal drawing buffer size to original image size + padding
