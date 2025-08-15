@@ -3,7 +3,7 @@
     <el-header class="app-header">
       <h1>智能图片拆分工具</h1>
     </el-header>
-    <el-container>
+    <el-container class="content-container">
       <el-main class="main-content">
         <el-card shadow="never" class="canvas-card">
           <canvas 
@@ -721,6 +721,8 @@ html, body, #app, .app-container {
   margin: 0;
   padding: 0;
   background-color: #f4f4f5;
+  display: flex; /* Enable flexbox */
+  flex-direction: column; /* Stack children vertically */
 }
 
 .app-header {
@@ -741,6 +743,12 @@ html, body, #app, .app-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1; /* Make it take available space */
+  min-height: 0; /* Allow it to shrink if content is too big */
+}
+
+.content-container {
+  flex: 1; /* Make it take remaining vertical space */
 }
 
 .canvas-card {
