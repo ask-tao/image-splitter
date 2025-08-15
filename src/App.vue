@@ -81,6 +81,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import type { UploadFile } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
+import JSZip from 'jszip';
 
 // Data Structures
 interface Box {
@@ -330,56 +331,61 @@ const onMouseMove = (e: MouseEvent) => {
     const originalW = selectedBox.w;
     const originalH = selectedBox.h;
 
+    let newX = selectedBox.x, newY = selectedBox.y, newW = selectedBox.w, newH = selectedBox.h;
+
     switch (activeAnchor.value) {
-      // Corner cases with aspect ratio
       case 'topLeft': {
-        const newW = originalX + originalW - currentX;
-        const newH = newW / originalAspectRatio.value;
-        selectedBox.x = currentX;
-        selectedBox.y = originalY + originalH - newH;
-        selectedBox.w = newW;
-        selectedBox.h = newH;
+        newX = currentX;
+        newY = currentY;
+        newW = originalX + originalW - currentX;
+        newH = newW / originalAspectRatio.value;
+        newY = originalY + originalH - newH;
         break;
       }
       case 'topRight': {
-        const newW = currentX - originalX;
-        const newH = newW / originalAspectRatio.value;
-        selectedBox.y = originalY + originalH - newH;
-        selectedBox.w = newW;
-        selectedBox.h = newH;
+        newW = currentX - originalX;
+        newH = newW / originalAspectRatio.value;
+        newY = originalY + originalH - newH;
         break;
       }
       case 'bottomLeft': {
-        const newW = originalX + originalW - currentX;
-        const newH = newW / originalAspectRatio.value;
-        selectedBox.x = currentX;
-        selectedBox.w = newW;
-        selectedBox.h = newH;
+        newX = currentX;
+        newW = originalX + originalW - currentX;
+        newH = newW / originalAspectRatio.value;
         break;
       }
       case 'bottomRight': {
-        const newW = currentX - originalX;
-        const newH = newW / originalAspectRatio.value;
-        selectedBox.w = newW;
-        selectedBox.h = newH;
+        newW = currentX - originalX;
+        newH = newW / originalAspectRatio.value;
         break;
       }
-      // Middle cases (no aspect ratio)
       case 'topMiddle':
-        selectedBox.y = currentY;
-        selectedBox.h = originalH - (currentY - originalY);
+        newY = currentY;
+        newH = originalY + originalH - currentY;
         break;
       case 'bottomMiddle':
-        selectedBox.h = currentY - originalY;
+        newH = currentY - originalY;
         break;
       case 'middleLeft':
-        selectedBox.x = currentX;
-        selectedBox.w = originalW - (currentX - originalX);
+        newX = currentX;
+        newW = originalX + originalW - currentX;
         break;
       case 'middleRight':
-        selectedBox.w = currentX - originalX;
+        newW = currentX - originalX;
         break;
     }
+
+    // Clamp resizing to canvas boundaries
+    if (newX < 0) { newW += newX; newX = 0; }
+    if (newY < 0) { newH += newY; newY = 0; }
+    if (newX + newW > canvasRef.value.width) { newW = canvasRef.value.width - newX; }
+    if (newY + newH > canvasRef.value.height) { newH = canvasRef.value.height - newY; }
+
+    selectedBox.x = newX;
+    selectedBox.y = newY;
+    selectedBox.w = newW;
+    selectedBox.h = newH;
+
     updatePreview();
   } else if (isMoving.value) {
     const canvas = canvasRef.value;
@@ -388,8 +394,8 @@ const onMouseMove = (e: MouseEvent) => {
       let newY = currentY - offsetY.value;
 
       // Clamp position to be within canvas boundaries
-      newX = Math.max(CANVAS_PADDING, Math.min(newX, canvas.width - CANVAS_PADDING - selectedBox.w));
-      newY = Math.max(CANVAS_PADDING, Math.min(newY, canvas.height - CANVAS_PADDING - selectedBox.h));
+      newX = Math.max(0, Math.min(newX, canvas.width - selectedBox.w));
+      newY = Math.max(0, Math.min(newY, canvas.height - selectedBox.h));
 
       selectedBox.x = newX;
       selectedBox.y = newY;
@@ -472,51 +478,6 @@ const handleClearAll = () => {
   });
 };
 
-import JSZip from 'jszip';
-
-const handleExport = async () => {
-  if (!sourceImage.value || boxes.value.length === 0) {
-    ElMessageBox.alert('没有可导出的内容，请先上传图集并创建选框。', '提示', { type: 'warning' });
-    return;
-  }
-
-  const zip = new JSZip();
-
-  for (const [index, box] of boxes.value.entries()) {
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = box.w;
-    tempCanvas.height = box.h;
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) continue;
-
-    tempCtx.drawImage(
-      sourceImage.value!,
-      box.x - CANVAS_PADDING,
-      box.y - CANVAS_PADDING,
-      box.w,
-      box.h,
-      0, 0, box.w, box.h
-    );
-
-    const blob = await new Promise<Blob | null>(resolve => tempCanvas.toBlob(resolve, 'image/png'));
-    if (blob) {
-      const filename = `${exportPrefix.value}${exportConnector.value}${index + 1}.png`;
-      zip.file(filename, blob);
-    }
-  }
-
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
-
-  const a = document.createElement('a');
-  const url = URL.createObjectURL(zipBlob);
-  a.href = url;
-  a.download = `${exportPrefix.value}.zip`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
-
 const handleAutoDetect = () => {
   const canvas = canvasRef.value;
   const ctx = ctxRef.value;
@@ -574,10 +535,20 @@ const handleAutoDetect = () => {
       }
 
       const padding = autoDetectPadding.value;
-      const boxX = Math.max(0, minX - padding) + CANVAS_PADDING;
-      const boxY = Math.max(0, minY - padding) + CANVAS_PADDING;
-      const boxW = (Math.min(width, maxX + padding) - Math.max(0, minX - padding)) + 1;
-      const boxH = (Math.min(height, maxY + padding) - Math.max(0, minY - padding)) + 1;
+      const originalW = maxX - minX + 1;
+      const originalH = maxY - minY + 1;
+
+      // Calculate the ideal, centered box with padding, in image coordinates
+      const idealX = minX - padding;
+      const idealY = minY - padding;
+      const idealW = originalW + padding * 2;
+      const idealH = originalH + padding * 2;
+
+      // Translate to canvas coordinates by adding the canvas padding. No image-boundary clipping.
+      const boxX = idealX + CANVAS_PADDING;
+      const boxY = idealY + CANVAS_PADDING;
+      const boxW = idealW;
+      const boxH = idealH;
 
       newBoxes.push({ id: Date.now() + newBoxes.length, x: boxX, y: boxY, w: boxW, h: boxH });
     }
@@ -589,6 +560,70 @@ const handleAutoDetect = () => {
   selectedBoxId.value = null;
   draw();
   updatePreview();
+};
+
+const handleExport = async () => {
+  if (!sourceImage.value || boxes.value.length === 0) {
+    ElMessageBox.alert('没有可导出的内容，请先上传图集并创建选框。', '提示', { type: 'warning' });
+    return;
+  }
+
+  const zip = new JSZip();
+  const img = sourceImage.value;
+
+  for (const [index, box] of boxes.value.entries()) {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = box.w;
+    tempCanvas.height = box.h;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) continue;
+
+    // Define the image area on the main canvas
+    const imageRect = { x: CANVAS_PADDING, y: CANVAS_PADDING, w: img.width, h: img.height };
+
+    // Find the intersection of the box and the image area
+    const intersectX = Math.max(box.x, imageRect.x);
+    const intersectY = Math.max(box.y, imageRect.y);
+    const intersectMaxX = Math.min(box.x + box.w, imageRect.x + imageRect.w);
+    const intersectMaxY = Math.min(box.y + box.h, imageRect.y + imageRect.h);
+
+    const intersectW = intersectMaxX - intersectX;
+    const intersectH = intersectMaxY - intersectY;
+
+    // Only draw if there is a valid intersection
+    if (intersectW > 0 && intersectH > 0) {
+      // Source coordinates are relative to the original image
+      const sourceX = intersectX - CANVAS_PADDING;
+      const sourceY = intersectY - CANVAS_PADDING;
+
+      // Destination coordinates are relative to the temp canvas
+      const destX = intersectX - box.x;
+      const destY = intersectY - box.y;
+
+      tempCtx.drawImage(
+        img,
+        sourceX, sourceY, intersectW, intersectH,         // Source rect (from original image)
+        destX, destY, intersectW, intersectH            // Destination rect (on temp canvas)
+      );
+    }
+
+    const blob = await new Promise<Blob | null>(resolve => tempCanvas.toBlob(resolve, 'image/png'));
+    if (blob) {
+      const filename = `${exportPrefix.value}${exportConnector.value}${index + 1}.png`;
+      zip.file(filename, blob);
+    }
+  }
+
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(zipBlob);
+  a.href = url;
+  a.download = `${exportPrefix.value}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 </script>
@@ -670,6 +705,5 @@ html, body, #app, .app-container {
 .upload-control {
   margin-bottom: 20px;
 }
-
 
 </style>
