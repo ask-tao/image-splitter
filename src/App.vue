@@ -38,6 +38,9 @@
             </el-upload>
 
             <el-divider>操作</el-divider>
+            <el-form-item label-width="80px" label="画布缩放">
+              <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
+            </el-form-item>
             <el-form-item label-width="80px" label="画布边距">
               <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
             </el-form-item>
@@ -132,6 +135,7 @@ const ANCHOR_SIZE = 8;
 const ANCHOR_COLOR = '#FFFFFF';
 const ANCHOR_STROKE_COLOR = '#007bff';
 
+const canvasZoom = ref(100); // 100% zoom
 const canvasPadding = ref(20); // Make canvas padding adjustable
 
 watch(canvasPadding, (newValue) => {
@@ -140,9 +144,22 @@ watch(canvasPadding, (newValue) => {
     if (canvas) {
       canvas.width = sourceImage.value.width + newValue * 2;
       canvas.height = sourceImage.value.height + newValue * 2;
+      // Update canvas style dimensions based on current zoom
+      canvas.style.width = `${canvas.width * (canvasZoom.value / 100)}px`;
+      canvas.style.height = `${canvas.height * (canvasZoom.value / 100)}px`;
       draw();
       updatePreview();
     }
+  }
+});
+
+watch(canvasZoom, (newValue) => {
+  const canvas = canvasRef.value;
+  if (canvas && sourceImage.value) {
+    // Update canvas style dimensions based on new zoom
+    canvas.style.width = `${(sourceImage.value.width + canvasPadding.value * 2) * (newValue / 100)}px`;
+    canvas.style.height = `${(sourceImage.value.height + canvasPadding.value * 2) * (newValue / 100)}px`;
+    draw(); // Redraw to apply new zoom
   }
 });
 
@@ -172,30 +189,42 @@ const draw = () => {
   const ctx = ctxRef.value;
   if (!canvas || !ctx) return;
 
+  // Clear the canvas based on its current display size
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // Save the unscaled state
+  ctx.save();
+
+  // Apply zoom transformation
+  const zoomFactor = canvasZoom.value / 100;
+  ctx.scale(zoomFactor, zoomFactor);
+
   if (sourceImage.value) {
+    // Draw image at scaled position
     ctx.drawImage(sourceImage.value, canvasPadding.value, canvasPadding.value);
 
     boxes.value.forEach(box => {
       const isSelected = box.id === selectedBoxId.value;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2 / zoomFactor; // Scale line width inversely to maintain visual thickness
       ctx.strokeStyle = isSelected ? '#007bff' : '#FF0000';
       ctx.strokeRect(box.x, box.y, box.w, box.h);
 
       if (isSelected) {
         ctx.fillStyle = ANCHOR_COLOR;
         ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1 / zoomFactor; // Scale line width inversely
         const anchors = getAnchors(box);
         for (const key in anchors) {
           const anchor = anchors[key as keyof typeof anchors];
-          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+          // Draw anchors at scaled positions, but maintain their visual size
+          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2 / zoomFactor, anchor.y - ANCHOR_SIZE / 2 / zoomFactor, ANCHOR_SIZE / zoomFactor, ANCHOR_SIZE / zoomFactor);
+          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2 / zoomFactor, anchor.y - ANCHOR_SIZE / 2 / zoomFactor, ANCHOR_SIZE / zoomFactor, ANCHOR_SIZE / zoomFactor);
         }
       }
     });
   }
+  // Restore the unscaled state
+  ctx.restore();
 };
 
 const updatePreview = () => {
@@ -253,8 +282,14 @@ const handleFileChange = (uploadFile: UploadFile) => {
       if (!canvas) return;
 
       sourceImage.value = img;
+      // Set canvas internal drawing buffer size to original image size + padding
       canvas.width = img.width + canvasPadding.value * 2;
       canvas.height = img.height + canvasPadding.value * 2;
+
+      // Apply zoom to the canvas *style* for display scaling
+      canvas.style.width = `${canvas.width * (canvasZoom.value / 100)}px`;
+      canvas.style.height = `${canvas.height * (canvasZoom.value / 100)}px`;
+
       boxes.value = [];
       selectedBoxId.value = null;
       draw();
@@ -316,8 +351,9 @@ const onMouseDown = (e: MouseEvent) => {
   e.preventDefault(); // Prevent default browser drag behavior
   if (!canvasRef.value || !sourceImage.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
-  startX.value = e.clientX - rect.left;
-  startY.value = e.clientY - rect.top;
+  // Adjust coordinates for zoom
+  startX.value = (e.clientX - rect.left) / (canvasZoom.value / 100);
+  startY.value = (e.clientY - rect.top) / (canvasZoom.value / 100);
 
   const selectedBox = boxes.value.find(b => b.id === selectedBoxId.value);
   if (selectedBox) {
@@ -349,8 +385,9 @@ const onMouseDown = (e: MouseEvent) => {
 const onMouseMove = (e: MouseEvent) => {
   if (!canvasRef.value || !sourceImage.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
-  const currentX = e.clientX - rect.left;
-  const currentY = e.clientY - rect.top;
+  // Adjust coordinates for zoom
+  const currentX = (e.clientX - rect.left) / (canvasZoom.value / 100);
+  const currentY = (e.clientY - rect.top) / (canvasZoom.value / 100);
 
   // Update cursor style
   const selectedBox = boxes.value.find(b => b.id === selectedBoxId.value);
