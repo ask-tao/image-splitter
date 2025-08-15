@@ -1,4 +1,4 @@
-# 智能图片拆分工具 (Image Splitter)
+# 智能图片拆分工具 (Image Split)
 
 ## 1. 项目介绍
 
