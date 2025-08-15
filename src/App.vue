@@ -243,23 +243,43 @@ const updatePreview = () => {
 const handleFileChange = (uploadFile: UploadFile) => {
   if (!uploadFile.raw || !uploadFile.raw.type.startsWith('image')) return;
 
-  const img = new Image();
-  const objectUrl = URL.createObjectURL(uploadFile.raw);
-  img.src = objectUrl;
+  const loadImage = () => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(uploadFile.raw!);
+    img.src = objectUrl;
 
-  img.onload = () => {
-    const canvas = canvasRef.value;
-    if (!canvas) return;
+    img.onload = () => {
+      const canvas = canvasRef.value;
+      if (!canvas) return;
 
-    sourceImage.value = img;
-    canvas.width = img.width + canvasPadding.value * 2;
-    canvas.height = img.height + canvasPadding.value * 2;
-    boxes.value = [];
-    selectedBoxId.value = null;
-    draw();
-    updatePreview();
-    URL.revokeObjectURL(objectUrl);
+      sourceImage.value = img;
+      canvas.width = img.width + canvasPadding.value * 2;
+      canvas.height = img.height + canvasPadding.value * 2;
+      boxes.value = [];
+      selectedBoxId.value = null;
+      draw();
+      updatePreview();
+      URL.revokeObjectURL(objectUrl);
+    };
   };
+
+  if (sourceImage.value) {
+    ElMessageBox.confirm(
+      '这会替换掉当前图片和所有选框，是否继续？',
+      '警告',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    ).then(() => {
+      loadImage();
+    }).catch(() => {
+      // User cancelled
+    });
+  } else {
+    loadImage();
+  }
 };
 
 const getBoxAt = (x: number, y: number): Box | null => {
