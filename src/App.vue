@@ -34,14 +34,9 @@
               </div>
             </el-upload>
 
-            <el-divider>预览</el-divider>
-            <div class="preview-box checkerboard-bg">
-              <canvas ref="previewCanvasRef"></canvas>
-            </div>
-
             <el-divider>操作</el-divider>
-            <el-form-item label-width="100px" label="识别内边距">
-              <el-input-number v-model="autoDetectPadding" :min="0" :max="50" controls-position="right" size="small" />
+            <el-form-item label-width="auto" label="内边距">
+              <el-input-number v-model="autoDetectPadding" :min="0" :max="50" controls-position="right" size="small" class="padding-input" />
             </el-form-item>
             <div class="action-buttons">
               <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">自动识别</el-button>
@@ -51,7 +46,12 @@
               </el-button>
             </div>
             
-            <el-divider>导出设置</el-divider>
+            <el-divider>预览</el-divider>
+            <div class="preview-box checkerboard-bg">
+              <canvas ref="previewCanvasRef"></canvas>
+            </div>
+            
+            <el-divider>导出</el-divider>
             <el-row :gutter="10">
               <el-col :span="18">
                 <el-input v-model="exportPrefix" placeholder="请输入文件名前缀">
@@ -685,6 +685,10 @@ html, body, #app, .app-container {
 .control-panel .el-divider__text {
   font-size: 14px;
   color: #909399;
+}
+
+.padding-input {
+  width: 100px; /* Adjust width as needed */
 }
 
 .action-buttons {

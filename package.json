@@ -1,7 +1,7 @@
 {
   "name": "pngsplit",
   "version": "1.0.0",
-  "description": "A tool to split texture atlas.",
+  "description": "A tool to split image atlas.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
