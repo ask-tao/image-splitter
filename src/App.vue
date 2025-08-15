@@ -1,14 +1,14 @@
 <template>
   <el-container class="app-container">
     <el-header class="app-header">
-      <h1>智能图集拆分工具</h1>
+      <h1>智能图片拆分工具</h1>
     </el-header>
     <el-container>
       <el-main class="main-content">
         <el-card shadow="never" class="canvas-card">
           <canvas 
             ref="canvasRef" 
-            class="editor-canvas"
+            class="editor-canvas checkerboard-bg"
             :style="{ cursor: cursorStyle }"
             @mousedown="onMouseDown"
             @mousemove="onMouseMove"
@@ -35,7 +35,7 @@
             </el-upload>
 
             <el-divider>预览</el-divider>
-            <div class="preview-box">
+            <div class="preview-box checkerboard-bg">
               <canvas ref="previewCanvasRef"></canvas>
             </div>
 
@@ -183,6 +183,13 @@ const updatePreview = () => {
   const previewCanvas = previewCanvasRef.value;
   if (!previewCanvas || !sourceImage.value) return;
 
+  const container = previewCanvas.parentElement;
+  if (!container) return;
+
+  // Match canvas buffer size to container size
+  previewCanvas.width = container.clientWidth;
+  previewCanvas.height = container.clientHeight;
+
   const previewCtx = previewCanvas.getContext('2d');
   if (!previewCtx) return;
 
@@ -191,6 +198,7 @@ const updatePreview = () => {
   const selectedBox = boxes.value.find(b => b.id === selectedBoxId.value);
 
   if (selectedBox && selectedBox.w > 0 && selectedBox.h > 0) {
+    // Calculate dimensions to draw while maintaining aspect ratio
     const aspectRatio = selectedBox.w / selectedBox.h;
     let drawW = previewCanvas.width;
     let drawH = drawW / aspectRatio;
@@ -200,13 +208,14 @@ const updatePreview = () => {
       drawW = drawH * aspectRatio;
     }
 
+    // Center the image within the canvas
     const drawX = (previewCanvas.width - drawW) / 2;
     const drawY = (previewCanvas.height - drawH) / 2;
 
     previewCtx.drawImage(
       sourceImage.value,
       selectedBox.x - CANVAS_PADDING, selectedBox.y - CANVAS_PADDING, selectedBox.w, selectedBox.h, // Source rect
-      drawX, drawY, drawW, drawH // Destination rect
+      drawX, drawY, drawW, drawH // Destination rect (aspect-ratio corrected)
     );
   }
 };
@@ -667,7 +676,6 @@ html, body, #app, .app-container {
 
 .editor-canvas {
   border: 1px dashed #dcdfe6;
-  background-color: #fff;
 }
 
 .sidebar {
@@ -704,6 +712,17 @@ html, body, #app, .app-container {
 
 .upload-control {
   margin-bottom: 20px;
+}
+
+.checkerboard-bg {
+  background-color: #ffffff;
+  background-image: 
+    linear-gradient(45deg, #eee 25%, transparent 25%), 
+    linear-gradient(135deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(135deg, transparent 75%, #eee 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 0, 10px -10px, 0px 10px;
 }
 
 </style>
