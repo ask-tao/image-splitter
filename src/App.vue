@@ -44,7 +44,7 @@
             <el-form-item label-width="80px" label="画布边距">
               <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
             </el-form-item>
-            <el-form-item label-width="auto" label="内边距">
+            <el-form-item label-width="auto" label="框内边距">
               <el-input-number v-model="autoDetectPadding" :min="0" :max="50" controls-position="right" size="small" class="padding-input" />
             </el-form-item>
             <div class="action-buttons">
