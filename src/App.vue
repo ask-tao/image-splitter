@@ -753,8 +753,12 @@ html, body, #app, .app-container {
   position: relative; /* For absolute positioning of placeholder */
   width: 100%;
   height: 100%;
-  /* Removed display: flex, justify-content, align-items */
   overflow: auto;
+  display: flex; /* Re-enable flexbox */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  padding: 20px; /* Add padding to the scrollable area */
+  box-sizing: border-box; /* Include padding in width/height calculation */
 }
 
 .canvas-placeholder {
@@ -779,6 +783,8 @@ html, body, #app, .app-container {
 
 .editor-canvas {
   border: 1px dashed #dcdfe6;
+  flex-shrink: 0; /* Prevent shrinking */
+  flex-grow: 0; /* Prevent growing */
 }
 
 .sidebar {
