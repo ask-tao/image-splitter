@@ -751,8 +751,9 @@ html, body, #app, .app-container {
 
 .canvas-card {
   position: relative; /* For absolute positioning of placeholder */
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 40px); /* Reduce width by 2 * margin */
+  height: calc(100% - 40px); /* Reduce height by 2 * margin */
+  margin: 20px; /* Add outer margin */
   overflow: auto;
   display: flex; /* Re-enable flexbox */
   justify-content: center; /* Center horizontally */
