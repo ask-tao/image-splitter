@@ -740,9 +740,7 @@ html, body, #app, .app-container {
 
 .main-content {
   padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* Removed display: flex, justify-content, align-items */
   flex: 1; /* Make it take available space */
   min-height: 0; /* Allow it to shrink if content is too big */
 }
