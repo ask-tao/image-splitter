@@ -755,9 +755,7 @@ html, body, #app, .app-container {
   position: relative; /* For absolute positioning of placeholder */
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* Removed display: flex, justify-content, align-items */
   overflow: auto;
 }
 
