@@ -750,15 +750,39 @@ html, body, #app, .app-container {
 }
 
 .canvas-card {
-  position: relative; /* For absolute positioning of placeholder */
+  position: relative;
   width: 100%;
-  height: 100% ;
+  height: 100%;
+  padding: 0 !important; 
+  box-sizing: border-box;
+}
+
+.canvas-card > .el-card__body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 20px;
+  box-sizing: border-box;
   overflow: auto;
-  display: flex; /* Re-enable flexbox */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  padding: 20px; /* Add padding to the scrollable area */
-  box-sizing: border-box; /* Include padding in width/height calculation */
+}
+
+/* Custom scrollbar styling for WebKit browsers (Chrome, Safari on macOS) */
+.canvas-card > .el-card__body::-webkit-scrollbar {
+  width: 10px;  /* Width of vertical scrollbar */
+  height: 10px; /* Height of horizontal scrollbar */
+}
+
+.canvas-card > .el-card__body::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track color */
+}
+
+.canvas-card > .el-card__body::-webkit-scrollbar-thumb {
+  background: #888; /* Handle color */
+  border-radius: 5px;
+}
+
+.canvas-card > .el-card__body::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Handle color on hover */
 }
 
 .canvas-placeholder {
@@ -785,6 +809,7 @@ html, body, #app, .app-container {
   border: 1px dashed #dcdfe6;
   flex-shrink: 0; /* Prevent shrinking */
   flex-grow: 0; /* Prevent growing */
+  margin: auto; 
 }
 
 .sidebar {
