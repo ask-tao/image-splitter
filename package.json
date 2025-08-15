@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "vue": "^3.5.18",
-    "element-plus": "^2.7.7"
+    "element-plus": "^2.7.7",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

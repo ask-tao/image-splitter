@@ -52,10 +52,20 @@
             </div>
             
             <el-divider>导出设置</el-divider>
-            <el-input placeholder="请输入文件名前缀" class="prefix-input">
-              <template #prepend>前缀</template>
-            </el-input>
-            <el-button type="success" style="width: 100%; margin-top: 10px;">
+            <el-row :gutter="10">
+              <el-col :span="18">
+                <el-input v-model="exportPrefix" placeholder="请输入文件名前缀">
+                  <template #prepend>前缀</template>
+                </el-input>
+              </el-col>
+              <el-col :span="6">
+                <el-input v-model="exportConnector" placeholder="连接符" />
+              </el-col>
+            </el-row>
+            <el-text type="info" size="small" style="margin-top: 5px; display: block;">
+              预览: {{ fileNamePreview }}
+            </el-text>
+            <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
               <el-icon><Download /></el-icon>
               全部导出
             </el-button>
@@ -67,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import type { UploadFile } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
@@ -117,6 +127,12 @@ const ANCHOR_STROKE_COLOR = '#007bff';
 const CANVAS_PADDING = 20;
 
 const autoDetectPadding = ref(0);
+const exportPrefix = ref('sprite');
+const exportConnector = ref('_');
+
+const fileNamePreview = computed(() => {
+  return `${exportPrefix.value}${exportConnector.value}1.png`;
+});
 
 const getAnchors = (box: Box) => {
   return {
@@ -456,6 +472,51 @@ const handleClearAll = () => {
   });
 };
 
+import JSZip from 'jszip';
+
+const handleExport = async () => {
+  if (!sourceImage.value || boxes.value.length === 0) {
+    ElMessageBox.alert('没有可导出的内容，请先上传图集并创建选框。', '提示', { type: 'warning' });
+    return;
+  }
+
+  const zip = new JSZip();
+
+  for (const [index, box] of boxes.value.entries()) {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = box.w;
+    tempCanvas.height = box.h;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) continue;
+
+    tempCtx.drawImage(
+      sourceImage.value!,
+      box.x - CANVAS_PADDING,
+      box.y - CANVAS_PADDING,
+      box.w,
+      box.h,
+      0, 0, box.w, box.h
+    );
+
+    const blob = await new Promise<Blob | null>(resolve => tempCanvas.toBlob(resolve, 'image/png'));
+    if (blob) {
+      const filename = `${exportPrefix.value}${exportConnector.value}${index + 1}.png`;
+      zip.file(filename, blob);
+    }
+  }
+
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(zipBlob);
+  a.href = url;
+  a.download = `${exportPrefix.value}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 const handleAutoDetect = () => {
   const canvas = canvasRef.value;
   const ctx = ctxRef.value;
@@ -610,7 +671,5 @@ html, body, #app, .app-container {
   margin-bottom: 20px;
 }
 
-.prefix-input {
-  margin-top: 10px;
-}
+
 </style>
