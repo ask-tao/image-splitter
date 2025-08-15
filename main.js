@@ -3,6 +3,6 @@ exports.unload = function() {};
 
 exports.methods = {
     openPanel() {
-        Editor.Panel.open('pngsplit');
+        Editor.Panel.open('imgsplit');
     },
 };

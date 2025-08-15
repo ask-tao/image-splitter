@@ -1,5 +1,5 @@
 {
-  "name": "pngsplit",
+  "name": "imgsplit",
   "version": "1.0.0",
   "description": "A tool to split image atlas.",
   "scripts": {
