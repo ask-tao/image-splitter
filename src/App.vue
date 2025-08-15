@@ -5,7 +5,7 @@
     </el-header>
     <el-container>
       <el-main class="main-content">
-        <el-card shadow="never" class="canvas-card" ref="canvasCardRef">
+        <el-card shadow="never" class="canvas-card">
           <canvas 
             ref="canvasRef" 
             class="editor-canvas checkerboard-bg"
@@ -105,7 +105,6 @@ const canvasRef = ref<HTMLCanvasElement | null>(null);
 const previewCanvasRef = ref<HTMLCanvasElement | null>(null);
 const ctxRef = ref<CanvasRenderingContext2D | null>(null);
 const sourceImage = ref<HTMLImageElement | null>(null);
-const canvasCardRef = ref<HTMLElement | null>(null);
 
 const boxes = ref<Box[]>([]);
 const selectedBoxId = ref<number | null>(null);
@@ -156,29 +155,10 @@ watch(canvasPadding, (newValue) => {
 
 watch(canvasZoom, (newValue) => {
   const canvas = canvasRef.value;
-  const canvasCard = canvasCardRef.value; // Get reference to parent div
-  console.log('watch(canvasZoom) - canvasCardRef.value:', canvasCardRef.value); // DEBUG
-  if (canvas && sourceImage.value && canvasCard) {
-    // Calculate desired display size based on new zoom
-    let desiredDisplayWidth = (sourceImage.value.width + canvasPadding.value * 2) * (newValue / 100);
-    let desiredDisplayHeight = (sourceImage.value.height + canvasPadding.value * 2) * (newValue / 100);
-
-    // Calculate fit factor to ensure it doesn't exceed parent boundaries
-    const parentWidth = canvasCard.clientWidth;
-    const parentHeight = canvasCard.clientHeight;
-
-    let fitFactor = 1;
-    if (desiredDisplayWidth > parentWidth) {
-      fitFactor = Math.min(fitFactor, parentWidth / desiredDisplayWidth);
-    }
-    if (desiredDisplayHeight > parentHeight) {
-      fitFactor = Math.min(fitFactor, parentHeight / desiredDisplayHeight);
-    }
-
-    // Apply the effective display size
-    canvas.style.width = `${desiredDisplayWidth * fitFactor}px`;
-    canvas.style.height = `${desiredDisplayHeight * fitFactor}px`;
-
+  if (canvas && sourceImage.value) {
+    // Update canvas style dimensions based on new zoom
+    canvas.style.width = `${(sourceImage.value.width + canvasPadding.value * 2) * (newValue / 100)}px`;
+    canvas.style.height = `${(sourceImage.value.height + canvasPadding.value * 2) * (newValue / 100)}px`;
     draw(); // Redraw to apply new zoom
   }
 });
@@ -299,34 +279,16 @@ const handleFileChange = (uploadFile: UploadFile) => {
 
     img.onload = () => {
       const canvas = canvasRef.value;
-      const canvasCard = canvasCardRef.value; // Get reference to parent div
-      console.log('handleFileChange - canvasCardRef.value:', canvasCardRef.value); // DEBUG
-      if (!canvas || !canvasCard) return;
+      if (!canvas) return;
 
       sourceImage.value = img;
       // Set canvas internal drawing buffer size to original image size + padding
       canvas.width = img.width + canvasPadding.value * 2;
       canvas.height = img.height + canvasPadding.value * 2;
 
-      // Calculate desired display size based on current zoom
-      let desiredDisplayWidth = canvas.width * (canvasZoom.value / 100);
-      let desiredDisplayHeight = canvas.height * (canvasZoom.value / 100);
-
-      // Calculate fit factor to ensure it doesn't exceed parent boundaries
-      const parentWidth = canvasCard.clientWidth;
-      const parentHeight = canvasCard.clientHeight;
-
-      let fitFactor = 1;
-      if (desiredDisplayWidth > parentWidth) {
-        fitFactor = Math.min(fitFactor, parentWidth / desiredDisplayWidth);
-      }
-      if (desiredDisplayHeight > parentHeight) {
-        fitFactor = Math.min(fitFactor, parentHeight / desiredDisplayHeight);
-      }
-
-      // Apply the effective display size
-      canvas.style.width = `${desiredDisplayWidth * fitFactor}px`;
-      canvas.style.height = `${desiredDisplayHeight * fitFactor}px`;
+      // Apply zoom to the canvas *style* for display scaling
+      canvas.style.width = `${canvas.width * (canvasZoom.value / 100)}px`;
+      canvas.style.height = `${canvas.height * (canvasZoom.value / 100)}px`;
 
       boxes.value = [];
       selectedBoxId.value = null;
