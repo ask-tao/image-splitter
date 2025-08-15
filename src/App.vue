@@ -189,42 +189,33 @@ const draw = () => {
   const ctx = ctxRef.value;
   if (!canvas || !ctx) return;
 
-  // Clear the canvas based on its current display size
+  // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Save the unscaled state
-  ctx.save();
-
-  // Apply zoom transformation
-  const zoomFactor = canvasZoom.value / 100;
-  ctx.scale(zoomFactor, zoomFactor);
-
   if (sourceImage.value) {
-    // Draw image at scaled position
+    // Draw image at 1:1 scale
     ctx.drawImage(sourceImage.value, canvasPadding.value, canvasPadding.value);
 
     boxes.value.forEach(box => {
       const isSelected = box.id === selectedBoxId.value;
-      ctx.lineWidth = 2 / zoomFactor; // Scale line width inversely to maintain visual thickness
+      ctx.lineWidth = 2; // Use constant line width
       ctx.strokeStyle = isSelected ? '#007bff' : '#FF0000';
       ctx.strokeRect(box.x, box.y, box.w, box.h);
 
       if (isSelected) {
         ctx.fillStyle = ANCHOR_COLOR;
         ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-        ctx.lineWidth = 1 / zoomFactor; // Scale line width inversely
+        ctx.lineWidth = 1; // Use constant line width
         const anchors = getAnchors(box);
         for (const key in anchors) {
           const anchor = anchors[key as keyof typeof anchors];
-          // Draw anchors at scaled positions, but maintain their visual size
-          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2 / zoomFactor, anchor.y - ANCHOR_SIZE / 2 / zoomFactor, ANCHOR_SIZE / zoomFactor, ANCHOR_SIZE / zoomFactor);
-          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2 / zoomFactor, anchor.y - ANCHOR_SIZE / 2 / zoomFactor, ANCHOR_SIZE / zoomFactor, ANCHOR_SIZE / zoomFactor);
+          // Draw anchors at constant size
+          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
         }
       }
     });
   }
-  // Restore the unscaled state
-  ctx.restore();
 };
 
 const updatePreview = () => {
