@@ -190,8 +190,15 @@ const fitGridToImage = () => {
 };
 
 const clearGrid = () => {
-  gridArea.value = null;
-  draw();
+  if (!gridArea.value) return;
+  ElMessageBox.confirm('此操作将清除网格，是否继续？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    gridArea.value = null;
+    draw();
+  }).catch(() => { });
 };
 
 
@@ -248,7 +255,7 @@ onUnmounted(() => {
 
 // --- Drawing and Preview ---
 const ANCHOR_SIZE = 8;
-const ANCHOR_COLOR = '#FFFFFF';
+const ANCHOR_COLOR = '#ffffff';
 const ANCHOR_STROKE_COLOR = '#007bff';
 
 const canvasZoom = ref(100); // 100% zoom
@@ -328,7 +335,7 @@ const draw = () => {
         if (isSelected) {
           ctx.fillStyle = ANCHOR_COLOR;
           ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-          ctx.lineWidth = 1; // Use constant line width
+          ctx.lineWidth = 2; // Use constant line width
           const anchors = getAnchors(box);
           for (const key in anchors) {
             const anchor = anchors[key as keyof typeof anchors];
@@ -341,25 +348,15 @@ const draw = () => {
     } else if (slicingMode.value === 'grid') {
       if (gridArea.value) {
         const box = gridArea.value;
-        // Draw main grid area with anchors
+        // Draw main grid area
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#007bff'; // Blue for grid area
         ctx.strokeRect(box.x, box.y, box.w, box.h);
 
-        ctx.fillStyle = ANCHOR_COLOR;
-        ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-        ctx.lineWidth = 1;
-        const anchors = getAnchors(box);
-        for (const key in anchors) {
-          const anchor = anchors[key as keyof typeof anchors];
-          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-        }
-
         // Draw grid lines
-        ctx.strokeStyle = 'red';
-        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#007bff'; // Blue for grid lines
         ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
 
         const cellWidth = box.w / gridCols.value;
         for (let i = 1; i < gridCols.value; i++) {
@@ -377,6 +374,17 @@ const draw = () => {
           ctx.stroke();
         }
         ctx.setLineDash([]); // Reset line dash
+
+        // Draw anchors on top
+        ctx.fillStyle = ANCHOR_COLOR;
+        ctx.strokeStyle = ANCHOR_STROKE_COLOR;
+        ctx.lineWidth = 2;
+        const anchors = getAnchors(box);
+        for (const key in anchors) {
+          const anchor = anchors[key as keyof typeof anchors];
+          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
+        }
       }
     }
   }
@@ -546,8 +554,10 @@ const onMouseDown = (e: MouseEvent) => {
         return;
       }
     }
-    isDrawing.value = true;
-    gridArea.value = { id: Date.now(), x: startX.value, y: startY.value, w: 0, h: 0 };
+    if (!gridArea.value) {
+      isDrawing.value = true;
+      gridArea.value = { id: Date.now(), x: startX.value, y: startY.value, w: 0, h: 0 };
+    }
   }
   draw();
   updatePreview();
@@ -718,16 +728,24 @@ const deleteBox = () => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (!sourceImage.value || slicingMode.value === 'grid') return;
+  if (!sourceImage.value) return;
+
   if (e.key === 'Delete' || e.key === 'Backspace') {
-    if (selectedBoxId.value !== null) {
-      e.preventDefault();
-      const index = boxes.value.findIndex(b => b.id === selectedBoxId.value);
-      if (index !== -1) {
-        boxes.value.splice(index, 1);
-        selectedBoxId.value = null;
-        draw();
-        updatePreview();
+    if (slicingMode.value === 'grid') {
+      if (gridArea.value) {
+        e.preventDefault();
+        clearGrid();
+      }
+    } else if (slicingMode.value === 'custom') {
+      if (selectedBoxId.value !== null) {
+        e.preventDefault();
+        const index = boxes.value.findIndex(b => b.id === selectedBoxId.value);
+        if (index !== -1) {
+          boxes.value.splice(index, 1);
+          selectedBoxId.value = null;
+          draw();
+          updatePreview();
+        }
       }
     }
   }
