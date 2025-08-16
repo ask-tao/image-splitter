@@ -1,27 +1,21 @@
 <template>
   <el-container class="app-container">
     <el-header class="app-header">
-      <h1>智能图片拆分工具</h1>
+      <h1>智能图片分割工具</h1>
     </el-header>
     <el-container class="content-container">
       <el-aside width="350px" class="sidebar">
         <el-card shadow="never">
           <div class="control-panel">
-            <el-upload
-              class="upload-control"
-              drag
-              action="#"
-              :show-file-list="false"
-              :auto-upload="false"
-              @change="handleFileChange"
-            >
+            <el-upload class="upload-control" drag action="#" :show-file-list="false" :auto-upload="false"
+              @change="handleFileChange">
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text">
                 将图片文件拖到此处，或<em>点击上传</em>
               </div>
             </el-upload>
 
-            <el-divider>操作</el-divider>
+            <el-divider>编辑</el-divider>
             <el-form-item label-width="80px" label="画布缩放">
               <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
             </el-form-item>
@@ -42,8 +36,10 @@
               <div class="action-buttons">
                 <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">自动识别</el-button>
                 <el-button type="danger" style="width: 100%;" @click="handleClearAll">
-                  <el-icon><Delete /></el-icon>
-                  清除
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
+                  清除选框
                 </el-button>
               </div>
             </div>
@@ -56,8 +52,10 @@
                 <el-input-number v-model="gridCols" :min="1" :max="100" size="small" />
               </el-form-item>
               <div class="action-buttons">
-                <el-button type="primary" style="width: 100%;" @click="fitGridToImage">贴合图片</el-button>
-                <el-button type="danger" style="width: 100%;" @click="clearGrid">清除网格</el-button>
+                <el-button type="primary" style="width: 100%;" @click="fitGridToImage">自动识别</el-button>
+                <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon>
+                    <Delete />
+                  </el-icon>清除网格</el-button>
               </div>
             </div>
 
@@ -76,7 +74,9 @@
               预览: {{ fileNamePreview }}
             </el-text>
             <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
-              <el-icon><Download /></el-icon>
+              <el-icon>
+                <Download />
+              </el-icon>
               全部导出
             </el-button>
 
@@ -89,17 +89,11 @@
       </el-aside>
       <el-main class="main-content">
         <el-card shadow="never" class="canvas-card">
-          <canvas 
-            ref="canvasRef" 
-            class="editor-canvas checkerboard-bg"
-            :style="{ cursor: cursorStyle }"
-            @mousedown="onMouseDown"
-            @mousemove="onMouseMove"
-            @mouseup="onMouseUp"
-            @mouseleave="onMouseLeave"
-            @contextmenu.prevent="onRightClick"
-          ></canvas>
-          <div v-if="!sourceImage" class="canvas-placeholder" @drop.prevent="onDrop" @dragover.prevent @click="onCanvasPlaceholderClick">
+          <canvas ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
+            @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
+            @contextmenu.prevent="onRightClick"></canvas>
+          <div v-if="!sourceImage" class="canvas-placeholder" @drop.prevent="onDrop" @dragover.prevent
+            @click="onCanvasPlaceholderClick">
             <input type="file" ref="fileInputRef" @change="onFileSelected" style="display: none" accept="image/*" />
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
@@ -107,7 +101,8 @@
             </div>
           </div>
           <!-- Context Menu -->
-          <div v-if="isMenuVisible" :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
+          <div v-if="isMenuVisible"
+            :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
             <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
               <span class="el-dropdown-link"></span>
               <template #dropdown>
@@ -465,7 +460,7 @@ const handleFileChange = (uploadFile: UploadFile) => {
       confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
     }).then(() => {
       loadImage();
-    }).catch(() => {});
+    }).catch(() => { });
   } else {
     loadImage();
   }
@@ -544,7 +539,7 @@ const onMouseDown = (e: MouseEvent) => {
         return;
       }
       if (startX.value >= gridArea.value.x && startX.value <= gridArea.value.x + gridArea.value.w &&
-          startY.value >= gridArea.value.y && startY.value <= gridArea.value.y + gridArea.value.h) {
+        startY.value >= gridArea.value.y && startY.value <= gridArea.value.y + gridArea.value.h) {
         isMoving.value = true;
         offsetX.value = startX.value - gridArea.value.x;
         offsetY.value = startY.value - gridArea.value.y;
@@ -687,7 +682,7 @@ const onRightClick = async (e: MouseEvent) => {
     menuTop.value = e.clientY;
     menuLeft.value = e.clientX;
     isMenuVisible.value = true;
-    await nextTick(); 
+    await nextTick();
     if (dropdownRef.value) {
       dropdownRef.value.handleOpen();
     }
@@ -748,7 +743,7 @@ const handleClearAll = () => {
       selectedBoxId.value = null;
       draw();
       updatePreview();
-    }).catch(() => {});
+    }).catch(() => { });
   } else if (slicingMode.value === 'grid') {
     clearGrid();
   }
@@ -774,7 +769,7 @@ const handleAutoDetect = () => {
     for (let x = 0; x < width; x++) {
       const index = (y * width + x);
       if (visited[index] || data[index * 4 + 3] === 0) continue;
-      
+
       const queue: [number, number][] = [[x, y]];
       visited[index] = 1;
       let minX = x, minY = y, maxX = x, maxY = y;
@@ -795,12 +790,12 @@ const handleAutoDetect = () => {
         }
       }
       const padding = autoDetectPadding.value;
-      newBoxes.push({ 
-        id: Date.now() + newBoxes.length, 
-        x: minX - padding + canvasPadding.value, 
-        y: minY - padding + canvasPadding.value, 
-        w: (maxX - minX + 1) + padding * 2, 
-        h: (maxY - minY + 1) + padding * 2 
+      newBoxes.push({
+        id: Date.now() + newBoxes.length,
+        x: minX - padding + canvasPadding.value,
+        y: minY - padding + canvasPadding.value,
+        w: (maxX - minX + 1) + padding * 2,
+        h: (maxY - minY + 1) + padding * 2
       });
     }
   }
@@ -846,7 +841,7 @@ const handleExport = async () => {
   }
 
   if (boxesToExport.length === 0) {
-     ElMessageBox.alert('没有可导出的内容。', '提示', { type: 'warning' });
+    ElMessageBox.alert('没有可导出的内容。', '提示', { type: 'warning' });
     return;
   }
 
@@ -897,13 +892,18 @@ const handleExport = async () => {
 </script>
 
 <style>
-html, body, #app, .app-container {
+html,
+body,
+#app,
+.app-container {
   height: 100%;
   margin: 0;
   padding: 0;
   background-color: #f4f4f5;
-  display: flex; /* Enable flexbox */
-  flex-direction: column; /* Stack children vertically */
+  display: flex;
+  /* Enable flexbox */
+  flex-direction: column;
+  /* Stack children vertically */
 }
 
 .app-header {
@@ -923,23 +923,26 @@ html, body, #app, .app-container {
 .main-content {
   padding: 10px;
   /* Removed display: flex, justify-content, align-items */
-  flex: 1; /* Make it take available space */
-  min-height: 0; /* Allow it to shrink if content is too big */
+  flex: 1;
+  /* Make it take available space */
+  min-height: 0;
+  /* Allow it to shrink if content is too big */
 }
 
 .content-container {
-  flex: 1; /* Make it take remaining vertical space */
+  flex: 1;
+  /* Make it take remaining vertical space */
 }
 
 .canvas-card {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 0 !important; 
+  padding: 0 !important;
   box-sizing: border-box;
 }
 
-.canvas-card > .el-card__body {
+.canvas-card>.el-card__body {
   width: 100%;
   height: 100%;
   display: flex;
@@ -949,22 +952,27 @@ html, body, #app, .app-container {
 }
 
 /* Custom scrollbar styling for WebKit browsers (Chrome, Safari on macOS) */
-.canvas-card > .el-card__body::-webkit-scrollbar {
-  width: 10px;  /* Width of vertical scrollbar */
-  height: 10px; /* Height of horizontal scrollbar */
+.canvas-card>.el-card__body::-webkit-scrollbar {
+  width: 10px;
+  /* Width of vertical scrollbar */
+  height: 10px;
+  /* Height of horizontal scrollbar */
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Track color */
+.canvas-card>.el-card__body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* Track color */
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar-thumb {
-  background: #888; /* Handle color */
+.canvas-card>.el-card__body::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Handle color */
   border-radius: 5px;
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Handle color on hover */
+.canvas-card>.el-card__body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Handle color on hover */
 }
 
 .canvas-placeholder {
@@ -978,7 +986,8 @@ html, body, #app, .app-container {
   justify-content: center;
   align-items: center;
   background-color: #fff;
-  z-index: 10; /* Ensure it's above canvas */
+  z-index: 10;
+  /* Ensure it's above canvas */
   border: 1px dashed #dcdfe6;
   border-radius: 6px;
   cursor: pointer;
@@ -1011,9 +1020,11 @@ html, body, #app, .app-container {
 
 .editor-canvas {
   border: 1px dashed #dcdfe6;
-  flex-shrink: 0; /* Prevent shrinking */
-  flex-grow: 0; /* Prevent growing */
-  margin: auto; 
+  flex-shrink: 0;
+  /* Prevent shrinking */
+  flex-grow: 0;
+  /* Prevent growing */
+  margin: auto;
 }
 
 .sidebar {
@@ -1030,7 +1041,8 @@ html, body, #app, .app-container {
 }
 
 .padding-input {
-  width: 100px; /* Adjust width as needed */
+  width: 100px;
+  /* Adjust width as needed */
 }
 
 .action-buttons {
@@ -1078,8 +1090,8 @@ html, body, #app, .app-container {
 
 .checkerboard-bg {
   background-color: #ffffff;
-  background-image: 
-    linear-gradient(45deg, #eee 25%, transparent 25%), 
+  background-image:
+    linear-gradient(45deg, #eee 25%, transparent 25%),
     linear-gradient(135deg, #eee 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #eee 75%),
     linear-gradient(135deg, transparent 75%, #eee 75%);
@@ -1091,5 +1103,4 @@ html, body, #app, .app-container {
   background-color: #fef0f0;
   color: #f56c6c;
 }
-
 </style>
