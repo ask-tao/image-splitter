@@ -4,35 +4,6 @@
       <h1>智能图片拆分工具</h1>
     </el-header>
     <el-container class="content-container">
-      <el-main class="main-content">
-        <el-card shadow="never" class="canvas-card">
-          <canvas 
-            ref="canvasRef" 
-            class="editor-canvas checkerboard-bg"
-            :style="{ cursor: cursorStyle }"
-            @mousedown="onMouseDown"
-            @mousemove="onMouseMove"
-            @mouseup="onMouseUp"
-            @mouseleave="onMouseLeave"
-            @contextmenu.prevent="onRightClick"
-          ></canvas>
-          <div v-if="!sourceImage" class="canvas-placeholder">
-            <p>请上传图片</p>
-          </div>
-          <!-- Context Menu -->
-          <div v-if="isMenuVisible" :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
-            <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
-              <span class="el-dropdown-link"></span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="sendToBack">层级置底</el-dropdown-item>
-                  <el-dropdown-item command="deleteBox" divided class="context-menu-item-danger">删除选框</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </el-card>
-      </el-main>
       <el-aside width="350px" class="sidebar">
         <el-card shadow="never">
           <div class="control-panel">
@@ -49,6 +20,25 @@
                 将图集文件拖到此处，或<em>点击上传</em>
               </div>
             </el-upload>
+
+            <el-divider>导出</el-divider>
+            <el-row :gutter="10">
+              <el-col :span="18">
+                <el-input v-model="exportPrefix" placeholder="请输入文件名前缀">
+                  <template #prepend>前缀</template>
+                </el-input>
+              </el-col>
+              <el-col :span="6">
+                <el-input v-model="exportConnector" placeholder="连接符" />
+              </el-col>
+            </el-row>
+            <el-text type="info" size="small" style="margin-top: 5px; display: block;">
+              预览: {{ fileNamePreview }}
+            </el-text>
+            <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
+              <el-icon><Download /></el-icon>
+              全部导出
+            </el-button>
 
             <el-divider>操作</el-divider>
             <el-form-item label-width="80px" label="画布缩放">
@@ -72,28 +62,42 @@
             <div class="preview-box checkerboard-bg">
               <canvas ref="previewCanvasRef"></canvas>
             </div>
-            
-            <el-divider>导出</el-divider>
-            <el-row :gutter="10">
-              <el-col :span="18">
-                <el-input v-model="exportPrefix" placeholder="请输入文件名前缀">
-                  <template #prepend>前缀</template>
-                </el-input>
-              </el-col>
-              <el-col :span="6">
-                <el-input v-model="exportConnector" placeholder="连接符" />
-              </el-col>
-            </el-row>
-            <el-text type="info" size="small" style="margin-top: 5px; display: block;">
-              预览: {{ fileNamePreview }}
-            </el-text>
-            <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
-              <el-icon><Download /></el-icon>
-              全部导出
-            </el-button>
           </div>
         </el-card>
       </el-aside>
+      <el-main class="main-content">
+        <el-card shadow="never" class="canvas-card">
+          <canvas 
+            ref="canvasRef" 
+            class="editor-canvas checkerboard-bg"
+            :style="{ cursor: cursorStyle }"
+            @mousedown="onMouseDown"
+            @mousemove="onMouseMove"
+            @mouseup="onMouseUp"
+            @mouseleave="onMouseLeave"
+            @contextmenu.prevent="onRightClick"
+          ></canvas>
+          <div v-if="!sourceImage" class="canvas-placeholder" @drop.prevent="onDrop" @dragover.prevent @click="onCanvasPlaceholderClick">
+            <input type="file" ref="fileInputRef" @change="onFileSelected" style="display: none" accept="image/*" />
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+              将图集文件拖到此处，或<em>点击上传</em>
+            </div>
+          </div>
+          <!-- Context Menu -->
+          <div v-if="isMenuVisible" :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
+            <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
+              <span class="el-dropdown-link"></span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="sendToBack">层级置底</el-dropdown-item>
+                  <el-dropdown-item command="deleteBox" divided class="context-menu-item-danger">删除选框</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </el-card>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -129,6 +133,27 @@ const startX = ref(0);
 const startY = ref(0);
 const offsetX = ref(0);
 const offsetY = ref(0);
+
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+const onCanvasPlaceholderClick = () => {
+  fileInputRef.value?.click();
+};
+
+const onFileSelected = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  if (target.files && target.files[0]) {
+    const uploadFile = { raw: target.files[0] } as UploadFile;
+    handleFileChange(uploadFile);
+  }
+};
+
+const onDrop = (e: DragEvent) => {
+  if (e.dataTransfer?.files && e.dataTransfer.files[0]) {
+    const uploadFile = { raw: e.dataTransfer.files[0] } as UploadFile;
+    handleFileChange(uploadFile);
+  }
+};
 
 // Context Menu State
 const dropdownRef = ref<DropdownInstance | null>(null);
@@ -883,22 +908,44 @@ html, body, #app, .app-container {
 
 .canvas-placeholder {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #909399;
-  font-size: 18px;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white overlay */
+  background-color: #fff;
   z-index: 10; /* Ensure it's above canvas */
+  border: 1px dashed #dcdfe6;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.canvas-placeholder p {
-  margin: 5px 0;
+.canvas-placeholder:hover {
+  border-color: #409EFF;
+}
+
+.canvas-placeholder .el-icon--upload {
+  font-size: 67px;
+  color: #C0C4CC;
+  margin: 0;
+}
+
+.canvas-placeholder .el-upload__text {
+  color: #606266;
+  font-size: 14px;
+}
+
+.canvas-placeholder .el-upload__text em {
+  color: #409EFF;
+  font-style: normal;
+}
+
+.canvas-placeholder .el-upload-dragger {
+  width: 100%;
+  height: 100%;
 }
 
 .editor-canvas {
@@ -909,7 +956,7 @@ html, body, #app, .app-container {
 }
 
 .sidebar {
-  padding: 20px 20px 20px 0;
+  padding: 20px 0 20px 20px;
 }
 
 .control-panel .el-divider__text {
@@ -946,6 +993,22 @@ html, body, #app, .app-container {
 
 .upload-control {
   margin-bottom: 20px;
+}
+
+.upload-control .el-upload-dragger {
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-control .el-icon--upload {
+  margin: 0;
+}
+
+.sidebar .el-icon--upload {
+  color: #C0C4CC;
 }
 
 .checkerboard-bg {
