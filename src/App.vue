@@ -5,7 +5,7 @@
     </el-header>
     <el-container class="content-container">
       <el-aside width="350px" class="sidebar">
-        <el-card shadow="never">
+        <el-card shadow="always">
           <div class="control-panel">
             <el-upload class="upload-control" drag action="#" :show-file-list="false" :auto-upload="false"
               @change="handleFileChange">
@@ -24,7 +24,7 @@
             </el-form-item>
             <el-form-item label-width="80px" label="切割模式">
               <el-radio-group v-model="slicingMode" size="small" class="slicing-mode-group">
-                <el-radio-button label="custom">自定义</el-radio-button>
+                <el-radio-button label="custom">框选</el-radio-button>
                 <el-radio-button label="grid">网格</el-radio-button>
               </el-radio-group>
             </el-form-item>
@@ -58,7 +58,7 @@
                 </el-col>
               </el-row>
               <div class="action-buttons">
-                <el-button type="primary" style="width: 100%;" @click="fitGridToImage">自动识别</el-button>
+                <el-button type="primary" style="width: 100%;" @click="fitGridToImage">生成网格</el-button>
                 <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon>
                     <Delete />
                   </el-icon>清除网格</el-button>
@@ -83,7 +83,7 @@
               <el-icon>
                 <Download />
               </el-icon>
-              全部导出
+              导出图片
             </el-button>
 
             <el-divider>预览</el-divider>
@@ -94,7 +94,7 @@
         </el-card>
       </el-aside>
       <el-main class="main-content">
-        <el-card shadow="never" class="canvas-card">
+        <el-card shadow="always" class="canvas-card">
           <canvas ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
             @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
             @contextmenu.prevent="onRightClick"></canvas>
@@ -839,7 +839,7 @@ const handleExport = async () => {
 
   if (slicingMode.value === 'custom') {
     if (boxes.value.length === 0) {
-      ElMessageBox.alert('自定义模式下没有选框可导出。', '提示', { type: 'warning' });
+      ElMessageBox.alert('框选模式下没有选框可导出。', '提示', { type: 'warning' });
       return;
     }
     boxesToExport = boxes.value;
@@ -970,7 +970,6 @@ body,
   width: 100%;
   height: 100%;
   display: flex;
-  padding: 10px;
   box-sizing: border-box;
   overflow: auto;
 }
@@ -1001,10 +1000,10 @@ body,
 
 .canvas-placeholder {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
