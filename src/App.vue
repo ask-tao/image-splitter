@@ -20,11 +20,16 @@
             <p>请上传图片</p>
           </div>
           <!-- Context Menu -->
-          <div v-if="isMenuVisible" class="context-menu" :style="{ top: menuTop + 'px', left: menuLeft + 'px' }">
-            <ul class="context-menu-list">
-              <li class="context-menu-item" @click="sendToBack">层级置底</li>
-              <li class="context-menu-item context-menu-item-danger" @click="deleteBox">删除选框</li>
-            </ul>
+          <div v-if="isMenuVisible" :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
+            <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
+              <span class="el-dropdown-link"></span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="sendToBack">层级置底</el-dropdown-item>
+                  <el-dropdown-item command="deleteBox" divided class="context-menu-item-danger">删除选框</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </el-card>
       </el-main>
@@ -94,8 +99,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
-import type { UploadFile } from 'element-plus';
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
+import type { UploadFile, DropdownInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
 import JSZip from 'jszip';
@@ -126,6 +131,7 @@ const offsetX = ref(0);
 const offsetY = ref(0);
 
 // Context Menu State
+const dropdownRef = ref<DropdownInstance | null>(null);
 const isMenuVisible = ref(false);
 const menuTop = ref(0);
 const menuLeft = ref(0);
@@ -133,6 +139,12 @@ const rightClickedBoxId = ref<number | null>(null);
 
 const closeContextMenu = () => {
   isMenuVisible.value = false;
+};
+
+const handleVisibleChange = (visible: boolean) => {
+  if (!visible) {
+    closeContextMenu();
+  }
 };
 
 // --- Lifecycle Hooks ---
@@ -406,9 +418,7 @@ const onMouseDown = (e: MouseEvent) => {
   updatePreview();
 };
 
-const onRightClick = (e: MouseEvent) => {
-  // Always hide the menu first to ensure clean state on every right-click.
-  isMenuVisible.value = false;
+const onRightClick = async (e: MouseEvent) => {
   if (!canvasRef.value || !sourceImage.value) return;
 
   const rect = canvasRef.value.getBoundingClientRect();
@@ -417,12 +427,23 @@ const onRightClick = (e: MouseEvent) => {
 
   const clickedBox = getBoxAt(x, y);
 
-  // Only if we click on a box, we set the state and show the menu again.
   if (clickedBox) {
     rightClickedBoxId.value = clickedBox.id;
-    isMenuVisible.value = true;
     menuTop.value = e.clientY;
     menuLeft.value = e.clientX;
+    isMenuVisible.value = true;
+    await nextTick(); 
+    if (dropdownRef.value) {
+      dropdownRef.value.handleOpen();
+    }
+  }
+};
+
+const handleCommand = (command: string) => {
+  if (command === 'sendToBack') {
+    sendToBack();
+  } else if (command === 'deleteBox') {
+    deleteBox();
   }
 };
 
@@ -938,31 +959,7 @@ html, body, #app, .app-container {
   background-position: 0 0, 10px 0, 10px -10px, 0px 10px;
 }
 
-.context-menu {
-  position: fixed;
-  background-color: white;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-  z-index: 1000;
-  min-width: 120px;
-}
-
-.context-menu-list {
-  list-style: none;
-  padding: 5px 0;
-  margin: 0;
-}
-
-.context-menu-item {
-  padding: 8px 15px;
-  cursor: pointer;
-}
-
-.context-menu-item:hover {
-  background-color: #f4f4f5;
-}
-
-.context-menu-item.context-menu-item-danger:hover {
+.context-menu-item-danger.el-dropdown-menu__item:hover {
   background-color: #fef0f0;
   color: #f56c6c;
 }
