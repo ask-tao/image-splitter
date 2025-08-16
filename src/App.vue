@@ -23,7 +23,7 @@
               <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
             </el-form-item>
             <el-form-item label-width="80px" label="切割模式">
-              <el-radio-group v-model="slicingMode" size="small">
+              <el-radio-group v-model="slicingMode" size="small" class="slicing-mode-group">
                 <el-radio-button label="custom">自定义</el-radio-button>
                 <el-radio-button label="grid">网格</el-radio-button>
               </el-radio-group>
@@ -45,12 +45,18 @@
             </div>
 
             <div v-if="slicingMode === 'grid'">
-              <el-form-item label-width="80px" label="行数">
-                <el-input-number v-model="gridRows" :min="1" :max="100" size="small" />
-              </el-form-item>
-              <el-form-item label-width="80px" label="列数">
-                <el-input-number v-model="gridCols" :min="1" :max="100" size="small" />
-              </el-form-item>
+              <el-row :gutter="10">
+                <el-col :span="12">
+                  <el-form-item label="行数">
+                    <el-input-number v-model="gridRows" :min="1" :max="100" size="small" style="width: 100%" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="列数">
+                    <el-input-number v-model="gridCols" :min="1" :max="100" size="small" style="width: 100%" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
               <div class="action-buttons">
                 <el-button type="primary" style="width: 100%;" @click="fitGridToImage">自动识别</el-button>
                 <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon>
@@ -1066,6 +1072,7 @@ body,
 .action-buttons {
   display: flex;
   gap: 10px;
+  margin-top: 15px;
   margin-bottom: 10px;
 }
 
@@ -1120,5 +1127,19 @@ body,
 .context-menu-item-danger.el-dropdown-menu__item:hover {
   background-color: #fef0f0;
   color: #f56c6c;
+}
+
+.slicing-mode-group {
+  display: flex;
+  flex: 1;
+}
+
+.slicing-mode-group .el-radio-button {
+  flex: 1;
+}
+
+.slicing-mode-group .el-radio-button .el-radio-button__inner {
+  width: 100%;
+  text-align: center;
 }
 </style>
