@@ -359,6 +359,13 @@ const onMouseDown = (e: MouseEvent) => {
 
   const clickedBox = getBoxAt(startX.value, startY.value);
   if (clickedBox) {
+    // Bring the clicked box to the top of the drawing order.
+    const clickedBoxIndex = boxes.value.findIndex(b => b.id === clickedBox.id);
+    if (clickedBoxIndex !== -1) {
+      const [boxToMove] = boxes.value.splice(clickedBoxIndex, 1);
+      boxes.value.push(boxToMove);
+    }
+
     selectedBoxId.value = clickedBox.id;
     isMoving.value = true;
     offsetX.value = startX.value - clickedBox.x;
