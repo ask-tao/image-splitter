@@ -950,6 +950,7 @@ body,
   flex: 1;
   /* Make it take available space */
   min-height: 0;
+  min-width: min-content;
   /* Allow it to shrink if content is too big */
 }
 
@@ -1085,6 +1086,7 @@ body,
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .preview-box canvas {
