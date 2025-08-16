@@ -14,9 +14,17 @@
             @mousemove="onMouseMove"
             @mouseup="onMouseUp"
             @mouseleave="onMouseLeave"
+            @contextmenu.prevent="onRightClick"
           ></canvas>
           <div v-if="!sourceImage" class="canvas-placeholder">
             <p>请上传图片</p>
+          </div>
+          <!-- Context Menu -->
+          <div v-if="isMenuVisible" class="context-menu" :style="{ top: menuTop + 'px', left: menuLeft + 'px' }">
+            <ul class="context-menu-list">
+              <li class="context-menu-item" @click="sendToBack">层级置底</li>
+              <li class="context-menu-item context-menu-item-danger" @click="deleteBox">删除选框</li>
+            </ul>
           </div>
         </el-card>
       </el-main>
@@ -117,6 +125,16 @@ const startY = ref(0);
 const offsetX = ref(0);
 const offsetY = ref(0);
 
+// Context Menu State
+const isMenuVisible = ref(false);
+const menuTop = ref(0);
+const menuLeft = ref(0);
+const rightClickedBoxId = ref<number | null>(null);
+
+const closeContextMenu = () => {
+  isMenuVisible.value = false;
+};
+
 // --- Lifecycle Hooks ---
 onMounted(() => {
   const canvas = canvasRef.value;
@@ -124,10 +142,12 @@ onMounted(() => {
     ctxRef.value = canvas.getContext('2d');
   }
   window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('click', closeContextMenu);
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('click', closeContextMenu);
 });
 
 // --- Drawing and Preview ---
@@ -311,7 +331,8 @@ const handleFileChange = (uploadFile: UploadFile) => {
 const getBoxAt = (x: number, y: number): Box | null => {
   for (let i = boxes.value.length - 1; i >= 0; i--) {
     const box = boxes.value[i];
-    if (x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h) {
+    // Ignore zero-sized boxes to prevent ghost selection.
+    if (box.w > 0 && box.h > 0 && x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h) {
       return box;
     }
   }
@@ -339,6 +360,11 @@ const getAnchorAt = (x: number, y: number, box: Box): string | null => {
 const originalAspectRatio = ref(1);
 
 const onMouseDown = (e: MouseEvent) => {
+  // Close context menu if it's open
+  if (isMenuVisible.value) {
+    closeContextMenu();
+  }
+
   e.preventDefault(); // Prevent default browser drag behavior
   if (!canvasRef.value || !sourceImage.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
@@ -378,6 +404,52 @@ const onMouseDown = (e: MouseEvent) => {
   }
   draw();
   updatePreview();
+};
+
+const onRightClick = (e: MouseEvent) => {
+  // Always hide the menu first to ensure clean state on every right-click.
+  isMenuVisible.value = false;
+  if (!canvasRef.value || !sourceImage.value) return;
+
+  const rect = canvasRef.value.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / (canvasZoom.value / 100);
+  const y = (e.clientY - rect.top) / (canvasZoom.value / 100);
+
+  const clickedBox = getBoxAt(x, y);
+
+  // Only if we click on a box, we set the state and show the menu again.
+  if (clickedBox) {
+    rightClickedBoxId.value = clickedBox.id;
+    isMenuVisible.value = true;
+    menuTop.value = e.clientY;
+    menuLeft.value = e.clientX;
+  }
+};
+
+const sendToBack = () => {
+  if (rightClickedBoxId.value === null) return;
+  const index = boxes.value.findIndex(b => b.id === rightClickedBoxId.value);
+  if (index !== -1) {
+    const [box] = boxes.value.splice(index, 1);
+    boxes.value.unshift(box);
+    draw();
+  }
+  closeContextMenu();
+};
+
+const deleteBox = () => {
+  if (rightClickedBoxId.value === null) return;
+  const index = boxes.value.findIndex(b => b.id === rightClickedBoxId.value);
+  if (index !== -1) {
+    // If the deleted box was also the selected one, deselect it.
+    if (selectedBoxId.value === rightClickedBoxId.value) {
+      selectedBoxId.value = null;
+    }
+    boxes.value.splice(index, 1);
+    draw();
+    updatePreview();
+  }
+  closeContextMenu();
 };
 
 const onMouseMove = (e: MouseEvent) => {
@@ -508,8 +580,13 @@ const onMouseUp = () => {
     const currentBox = boxes.value[boxes.value.length - 1];
     if (currentBox.w < 0) { currentBox.x += currentBox.w; currentBox.w = -currentBox.w; }
     if (currentBox.h < 0) { currentBox.y += currentBox.h; currentBox.h = -currentBox.h; }
-    if (currentBox.w < 5 || currentBox.h < 5) { boxes.value.pop(); }
-    selectedBoxId.value = currentBox ? currentBox.id : null;
+    // Cleanup tiny boxes created by mistake and select the new box.
+    if (currentBox.w < 5 || currentBox.h < 5) {
+      boxes.value.pop();
+      selectedBoxId.value = null;
+    } else {
+      selectedBoxId.value = currentBox.id;
+    }
     updatePreview();
   } 
 
@@ -859,6 +936,35 @@ html, body, #app, .app-container {
     linear-gradient(135deg, transparent 75%, #eee 75%);
   background-size: 20px 20px;
   background-position: 0 0, 10px 0, 10px -10px, 0px 10px;
+}
+
+.context-menu {
+  position: fixed;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+  min-width: 120px;
+}
+
+.context-menu-list {
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+}
+
+.context-menu-item {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.context-menu-item:hover {
+  background-color: #f4f4f5;
+}
+
+.context-menu-item.context-menu-item-danger:hover {
+  background-color: #fef0f0;
+  color: #f56c6c;
 }
 
 </style>
