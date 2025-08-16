@@ -17,9 +17,27 @@
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text">
-                将图集文件拖到此处，或<em>点击上传</em>
+                将图片文件拖到此处，或<em>点击上传</em>
               </div>
             </el-upload>
+
+            <el-divider>操作</el-divider>
+            <el-form-item label-width="80px" label="画布缩放">
+              <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
+            </el-form-item>
+            <el-form-item label-width="80px" label="画布边距">
+              <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
+            </el-form-item>
+            <el-form-item label-width="auto" label="选框边距">
+              <el-slider v-model="autoDetectPadding" :min="0" :max="20" :step="1" show-input size="small" />
+            </el-form-item>
+            <div class="action-buttons">
+              <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">自动识别</el-button>
+              <el-button type="danger" style="width: 100%;" @click="handleClearAll">
+                <el-icon><Delete /></el-icon>
+                清除
+              </el-button>
+            </div>
 
             <el-divider>导出</el-divider>
             <el-row :gutter="10">
@@ -40,24 +58,6 @@
               全部导出
             </el-button>
 
-            <el-divider>操作</el-divider>
-            <el-form-item label-width="80px" label="画布缩放">
-              <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
-            </el-form-item>
-            <el-form-item label-width="80px" label="画布边距">
-              <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
-            </el-form-item>
-            <el-form-item label-width="auto" label="框内边距">
-              <el-input-number v-model="autoDetectPadding" :min="0" :max="50" controls-position="right" size="small" class="padding-input" />
-            </el-form-item>
-            <div class="action-buttons">
-              <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">自动识别</el-button>
-              <el-button type="danger" style="width: 100%;" @click="handleClearAll">
-                <el-icon><Delete /></el-icon>
-                清除
-              </el-button>
-            </div>
-            
             <el-divider>预览</el-divider>
             <div class="preview-box checkerboard-bg">
               <canvas ref="previewCanvasRef"></canvas>
@@ -81,7 +81,7 @@
             <input type="file" ref="fileInputRef" @change="onFileSelected" style="display: none" accept="image/*" />
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
-              将图集文件拖到此处，或<em>点击上传</em>
+              将图片文件拖到此处，或<em>点击上传</em>
             </div>
           </div>
           <!-- Context Menu -->
@@ -221,6 +221,12 @@ watch(canvasZoom, (newValue) => {
 });
 
 const autoDetectPadding = ref(0);
+
+watch(autoDetectPadding, () => {
+  if (sourceImage.value && boxes.value.length > 0) {
+    handleAutoDetect();
+  }
+});
 const exportPrefix = ref('sprite');
 const exportConnector = ref('_');
 
@@ -852,6 +858,7 @@ html, body, #app, .app-container {
   justify-content: center;
   background-color: #ffffff;
   border-bottom: 1px solid #e4e7ed;
+  padding: 0 10px;
 }
 
 .app-header h1 {
@@ -860,7 +867,7 @@ html, body, #app, .app-container {
 }
 
 .main-content {
-  padding: 20px;
+  padding: 10px;
   /* Removed display: flex, justify-content, align-items */
   flex: 1; /* Make it take available space */
   min-height: 0; /* Allow it to shrink if content is too big */
@@ -882,7 +889,7 @@ html, body, #app, .app-container {
   width: 100%;
   height: 100%;
   display: flex;
-  padding: 20px;
+  padding: 10px;
   box-sizing: border-box;
   overflow: auto;
 }
@@ -908,10 +915,10 @@ html, body, #app, .app-container {
 
 .canvas-placeholder {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -956,12 +963,16 @@ html, body, #app, .app-container {
 }
 
 .sidebar {
-  padding: 20px 0 20px 20px;
+  padding: 10px 0 10px 10px;
 }
 
 .control-panel .el-divider__text {
   font-size: 14px;
   color: #909399;
+}
+
+.control-panel .el-form-item {
+  margin-bottom: 5px;
 }
 
 .padding-input {
@@ -971,7 +982,7 @@ html, body, #app, .app-container {
 .action-buttons {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .preview-box {
