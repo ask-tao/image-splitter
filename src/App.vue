@@ -22,6 +22,12 @@
             </el-upload>
 
             <el-divider>操作</el-divider>
+            <el-form-item label-width="80px" label="画布缩放">
+              <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
+            </el-form-item>
+            <el-form-item label-width="80px" label="画布边距">
+              <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
+            </el-form-item>
             <el-form-item label-width="80px" label="切割模式">
               <el-radio-group v-model="slicingMode" size="small">
                 <el-radio-button label="custom">自定义</el-radio-button>
@@ -30,12 +36,6 @@
             </el-form-item>
 
             <div v-if="slicingMode === 'custom'">
-              <el-form-item label-width="80px" label="画布缩放">
-                <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
-              </el-form-item>
-              <el-form-item label-width="80px" label="画布边距">
-                <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
-              </el-form-item>
               <el-form-item label-width="auto" label="选框边距">
                 <el-slider v-model="autoDetectPadding" :min="0" :max="20" :step="1" show-input size="small" />
               </el-form-item>
