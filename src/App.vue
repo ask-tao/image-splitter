@@ -361,8 +361,8 @@ const draw = () => {
 
         // Draw grid lines
         ctx.strokeStyle = '#007bff'; // Blue for grid lines
-        ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 0;
+        ctx.setLineDash([4, 4]);
 
         const cellWidth = box.w / gridCols.value;
         for (let i = 1; i < gridCols.value; i++) {
@@ -606,10 +606,70 @@ const onMouseMove = (e: MouseEvent) => {
     let newX = targetBox.x, newY = targetBox.y, newW = targetBox.w, newH = targetBox.h;
 
     switch (activeAnchor.value) {
-      case 'topLeft': { newX = currentX; newY = currentY; newW = originalX + originalW - currentX; newH = originalY + originalH - currentY; break; }
-      case 'topRight': { newW = currentX - originalX; newY = currentY; newH = originalY + originalH - currentY; break; }
-      case 'bottomLeft': { newX = currentX; newW = originalX + originalW - currentX; newH = currentY - originalY; break; }
-      case 'bottomRight': { newW = currentX - originalX; newH = currentY - originalY; break; }
+      case 'topLeft': {
+        newX = currentX;
+        newY = currentY;
+        newW = originalX + originalW - currentX;
+        newH = originalY + originalH - currentY;
+
+        if (originalAspectRatio.value !== 0) {
+          const newAspectRatio = newW / newH;
+          if (newAspectRatio > originalAspectRatio.value) {
+            newW = newH * originalAspectRatio.value;
+            newX = originalX + originalW - newW;
+          } else if (newAspectRatio < originalAspectRatio.value) {
+            newH = newW / originalAspectRatio.value;
+            newY = originalY + originalH - newH;
+          }
+        }
+        break;
+      }
+      case 'topRight': {
+        newW = currentX - originalX;
+        newY = currentY;
+        newH = originalY + originalH - currentY;
+
+        if (originalAspectRatio.value !== 0) {
+          const newAspectRatio = newW / newH;
+          if (newAspectRatio > originalAspectRatio.value) {
+            newW = newH * originalAspectRatio.value;
+          } else if (newAspectRatio < originalAspectRatio.value) {
+            newH = newW / originalAspectRatio.value;
+            newY = originalY + originalH - newH;
+          }
+        }
+        break;
+      }
+      case 'bottomLeft': {
+        newX = currentX;
+        newW = originalX + originalW - currentX;
+        newH = currentY - originalY;
+
+        if (originalAspectRatio.value !== 0) {
+          const newAspectRatio = newW / newH;
+          if (newAspectRatio > originalAspectRatio.value) {
+            newW = newH * originalAspectRatio.value;
+            newX = originalX + originalW - newW;
+          } else if (newAspectRatio < originalAspectRatio.value) {
+            newH = newW / originalAspectRatio.value;
+          }
+        }
+        break;
+      }
+      case 'bottomRight': {
+        newW = currentX - originalX;
+        newH = currentY - originalY;
+
+        if (originalAspectRatio.value !== 0) {
+          const newAspectRatio = newW / newH;
+          if (newAspectRatio > originalAspectRatio.value) {
+            newW = newH * originalAspectRatio.value;
+          } else if (newAspectRatio < originalAspectRatio.value) {
+            newH = newW / originalAspectRatio.value;
+          }
+        }
+        break;
+      }
       case 'topMiddle': { newY = currentY; newH = originalY + originalH - currentY; break; }
       case 'bottomMiddle': { newH = currentY - originalY; break; }
       case 'middleLeft': { newX = currentX; newW = originalX + originalW - currentX; break; }
