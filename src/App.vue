@@ -127,7 +127,7 @@
 
 <script setup lang="ts">
 import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
-import { useImageEditor } from './logic';
+import { useImageEditor } from './composables/useImageEditor';
 
 const {
   canvasRef,
