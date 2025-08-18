@@ -539,6 +539,8 @@ export function useImageEditor() {
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (!editorState.sourceImage) return;
+
+    // Handle Delete and Backspace
     if (e.key === 'Delete' || e.key === 'Backspace') {
       if (slicingMode.value === 'grid' && editorState.gridArea) {
         e.preventDefault();
@@ -547,6 +549,37 @@ export function useImageEditor() {
         e.preventDefault();
         editorState.deleteBox(selectedBoxId.value);
         selectedBoxId.value = null;
+      }
+    }
+
+    // Handle Arrow Key movement
+    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    if (arrowKeys.includes(e.key)) {
+      let targetBox: Box | null = null;
+      if (slicingMode.value === 'custom' && selectedBoxId.value !== null) {
+        targetBox = editorState.boxes.find(b => b.id === selectedBoxId.value) || null;
+      } else if (slicingMode.value === 'grid' && editorState.gridArea) {
+        targetBox = editorState.gridArea;
+      }
+
+      if (targetBox) {
+        e.preventDefault();
+        const moveAmount = e.shiftKey ? 10 : 1;
+
+        switch (e.key) {
+          case 'ArrowUp':
+            targetBox.y -= moveAmount;
+            break;
+          case 'ArrowDown':
+            targetBox.y += moveAmount;
+            break;
+          case 'ArrowLeft':
+            targetBox.x -= moveAmount;
+            break;
+          case 'ArrowRight':
+            targetBox.x += moveAmount;
+            break;
+        }
       }
     }
   };
