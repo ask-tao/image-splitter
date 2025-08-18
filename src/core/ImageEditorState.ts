@@ -15,8 +15,8 @@ export class ImageEditorState {
   gridArea: Box | null = null;
   gridRows: number = 2;
   gridCols: number = 2;
-  selectionWidth: number | undefined = 10;
-  selectionHeight: number | undefined = 10;
+  selectionWidth: number | undefined = undefined;
+  selectionHeight: number | undefined = undefined;
 
   constructor() {}
 
@@ -76,7 +76,7 @@ export class ImageEditorState {
     this.gridArea = null;
   }
 
-  autoDetect(imageData: ImageData, padding: number, canvasPadding: number, fixedWidth?: number, fixedHeight?: number): Box[] {
+  autoDetect(imageData: ImageData, padding: number, canvasPadding: number, shouldSetFixedSize?: boolean): Box[] {
     const { data, width, height } = imageData;
     const visited = new Uint8Array(width * height);
     const newBoxes: Box[] = [];
@@ -106,12 +106,26 @@ export class ImageEditorState {
           }
         }
 
+        console.log(`Detected object: minX=${minX}, minY=${minY}, maxX=${maxX}, maxY=${maxY}`);
+
         let boxW = (maxX - minX + 1) + padding * 2;
         let boxH = (maxY - minY + 1) + padding * 2;
 
-        if (fixedWidth !== undefined && fixedHeight !== undefined) {
-          boxW = fixedWidth;
-          boxH = fixedHeight;
+        console.log('shouldSetFixedSize:', shouldSetFixedSize);
+        console.log('Initial selectionWidth:', this.selectionWidth, 'selectionHeight:', this.selectionHeight);
+        console.log('Detected boxW:', boxW, 'boxH:', boxH);
+
+        if (shouldSetFixedSize && (this.selectionWidth == null || this.selectionHeight == null)) {
+          console.log('Condition met: Setting selectionWidth/Height');
+          this.selectionWidth = boxW;
+          this.selectionHeight = boxH;
+          console.log('New selectionWidth:', this.selectionWidth, 'New selectionHeight:', this.selectionHeight);
+        }
+
+        if (this.selectionWidth != null && this.selectionHeight != null) {
+          boxW = this.selectionWidth;
+          boxH = this.selectionHeight;
+          console.log('Using fixed dimensions:', boxW, boxH);
         }
 
         newBoxes.push({

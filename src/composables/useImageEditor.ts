@@ -242,7 +242,7 @@ export function useImageEditor() {
     if (editorState.sourceImage) {
       ElMessageBox.confirm('这会替换掉当前图片和所有选框，是否继续？', '警告', {
         confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
-      }).then(performLoad).catch(() => {});
+      }).then(performLoad).catch(() => { });
     } else {
       performLoad();
     }
@@ -356,93 +356,93 @@ export function useImageEditor() {
 
     // Handle moving and resizing
     if (isResizing.value && targetBox) {
-        const originalX = targetBox.x;
-        const originalY = targetBox.y;
-        const originalW = targetBox.w;
-        const originalH = targetBox.h;
-        let newX = targetBox.x, newY = targetBox.y, newW = targetBox.w, newH = targetBox.h;
+      const originalX = targetBox.x;
+      const originalY = targetBox.y;
+      const originalW = targetBox.w;
+      const originalH = targetBox.h;
+      let newX = targetBox.x, newY = targetBox.y, newW = targetBox.w, newH = targetBox.h;
 
-        if (e.shiftKey) {
-            // Update originalAspectRatio based on current box dimensions when Shift is pressed
-            originalAspectRatio.value = targetBox.w / targetBox.h;
-        }
+      if (e.shiftKey) {
+        // Update originalAspectRatio based on current box dimensions when Shift is pressed
+        originalAspectRatio.value = targetBox.w / targetBox.h;
+      }
 
-        switch (activeAnchor.value) {
-            case 'topLeft': {
-                newW = originalX + originalW - currentX;
-                newH = originalY + originalH - currentY;
-                if (e.shiftKey) {
-                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                        newH = newW / originalAspectRatio.value;
-                    } else {
-                        newW = newH * originalAspectRatio.value;
-                    }
-                }
-                newX = originalX + originalW - newW;
-                newY = originalY + originalH - newH;
-                break;
+      switch (activeAnchor.value) {
+        case 'topLeft': {
+          newW = originalX + originalW - currentX;
+          newH = originalY + originalH - currentY;
+          if (e.shiftKey) {
+            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+              newH = newW / originalAspectRatio.value;
+            } else {
+              newW = newH * originalAspectRatio.value;
             }
-            case 'topRight': {
-                newW = currentX - originalX;
-                newH = originalY + originalH - currentY;
-                if (e.shiftKey) {
-                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                        newH = newW / originalAspectRatio.value;
-                    } else {
-                        newW = newH * originalAspectRatio.value;
-                    }
-                }
-                newY = originalY + originalH - newH;
-                break;
-            }
-            case 'bottomLeft': {
-                newW = originalX + originalW - currentX;
-                newH = currentY - originalY;
-                if (e.shiftKey) {
-                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                        newH = newW / originalAspectRatio.value;
-                    } else {
-                        newW = newH * originalAspectRatio.value;
-                    }
-                }
-                newX = originalX + originalW - newW;
-                break;
-            }
-            case 'bottomRight': {
-                newW = currentX - originalX;
-                newH = currentY - originalY;
-                if (e.shiftKey) {
-                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                        newH = newW / originalAspectRatio.value;
-                    } else {
-                        newW = newH * originalAspectRatio.value;
-                    }
-                }
-                break;
-            }
-            case 'topMiddle': { newY = currentY; newH = originalY + originalH - currentY; break; }
-            case 'bottomMiddle': { newH = currentY - originalY; break; }
-            case 'middleLeft': { newX = currentX; newW = originalX + originalW - currentX; break; }
-            case 'middleRight': { newW = currentX - originalX; break; }
+          }
+          newX = originalX + originalW - newW;
+          newY = originalY + originalH - newH;
+          break;
         }
-        if (newX < 0) { newW += newX; newX = 0; }
-        if (newY < 0) { newH += newY; newY = 0; }
-        if (newX + newW > canvasRef.value.width) { newW = canvasRef.value.width - newX; }
-        if (newY + newH > canvasRef.value.height) { newH = canvasRef.value.height - newY; }
-        targetBox.x = newX; targetBox.y = newY; targetBox.w = newW; targetBox.h = newH;
+        case 'topRight': {
+          newW = currentX - originalX;
+          newH = originalY + originalH - currentY;
+          if (e.shiftKey) {
+            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+              newH = newW / originalAspectRatio.value;
+            } else {
+              newW = newH * originalAspectRatio.value;
+            }
+          }
+          newY = originalY + originalH - newH;
+          break;
+        }
+        case 'bottomLeft': {
+          newW = originalX + originalW - currentX;
+          newH = currentY - originalY;
+          if (e.shiftKey) {
+            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+              newH = newW / originalAspectRatio.value;
+            } else {
+              newW = newH * originalAspectRatio.value;
+            }
+          }
+          newX = originalX + originalW - newW;
+          break;
+        }
+        case 'bottomRight': {
+          newW = currentX - originalX;
+          newH = currentY - originalY;
+          if (e.shiftKey) {
+            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+              newH = newW / originalAspectRatio.value;
+            } else {
+              newW = newH * originalAspectRatio.value;
+            }
+          }
+          break;
+        }
+        case 'topMiddle': { newY = currentY; newH = originalY + originalH - currentY; break; }
+        case 'bottomMiddle': { newH = currentY - originalY; break; }
+        case 'middleLeft': { newX = currentX; newW = originalX + originalW - currentX; break; }
+        case 'middleRight': { newW = currentX - originalX; break; }
+      }
+      if (newX < 0) { newW += newX; newX = 0; }
+      if (newY < 0) { newH += newY; newY = 0; }
+      if (newX + newW > canvasRef.value.width) { newW = canvasRef.value.width - newX; }
+      if (newY + newH > canvasRef.value.height) { newH = canvasRef.value.height - newY; }
+      targetBox.x = newX; targetBox.y = newY; targetBox.w = newW; targetBox.h = newH;
     } else if (isMoving.value && targetBox) {
-        let newX = currentX - offsetX.value;
-        let newY = currentY - offsetY.value;
-        newX = Math.max(0, Math.min(newX, canvasRef.value.width - targetBox.w));
-        newY = Math.max(0, Math.min(newY, canvasRef.value.height - targetBox.h));
-        targetBox.x = newX;
-        targetBox.y = newY;
+      let newX = currentX - offsetX.value;
+      let newY = currentY - offsetY.value;
+      newX = Math.max(0, Math.min(newX, canvasRef.value.width - targetBox.w));
+      newY = Math.max(0, Math.min(newY, canvasRef.value.height - targetBox.h));
+      targetBox.x = newX;
+      targetBox.y = newY;
     } else if (isDrawing.value) {
-        const boxToDraw = slicingMode.value === 'custom' ? editorState.boxes[editorState.boxes.length - 1] : editorState.gridArea;
-        if (boxToDraw) {
-            boxToDraw.w = currentX - startX.value;
-            boxToDraw.h = currentY - startY.value;
-        }
+      const boxToDraw = slicingMode.value === 'custom' ? editorState.boxes[editorState.boxes.length - 1] : editorState.gridArea;
+      if (boxToDraw) {
+        boxToDraw.w = currentX - startX.value;
+        boxToDraw.h = currentY - startY.value;
+      }
     }
   };
 
@@ -533,7 +533,7 @@ export function useImageEditor() {
       }).then(() => {
         editorState.clearBoxes();
         selectedBoxId.value = null;
-      }).catch(() => {});
+      }).catch(() => { });
     } else if (slicingMode.value === 'grid') {
       editorState.clearGrid();
     }
@@ -553,7 +553,8 @@ export function useImageEditor() {
     if (autoDetectMode.value === 'padding') {
       editorState.autoDetect(imageData, autoDetectPadding.value, canvasPadding.value);
     } else if (autoDetectMode.value === 'fixedSize') {
-      editorState.autoDetect(imageData, 0, canvasPadding.value, editorState.selectionWidth, editorState.selectionHeight);
+      const shouldSetFixedSize = editorState.selectionWidth == null || editorState.selectionHeight == null;
+      editorState.autoDetect(imageData, 0, canvasPadding.value, shouldSetFixedSize);
     }
   };
 
@@ -568,7 +569,25 @@ export function useImageEditor() {
     }
   });
 
-  watch([() => editorState.selectionWidth, () => editorState.selectionHeight], () => {
+  watch(autoDetectMode, (newMode, oldMode) => {
+    if (newMode === 'padding') {
+      editorState.selectionWidth = undefined;
+      editorState.selectionHeight = undefined;
+    }
+    // Only reapply auto-detect if the mode actually changed and it's not the initial setup
+    if (newMode !== oldMode) {
+      reapplyAutoDetect();
+    }
+  });
+
+  watch([() => editorState.selectionWidth, () => editorState.selectionHeight], (newValues) => {
+    const [newWidth, newHeight] = newValues;
+    if (newWidth === null) {
+      editorState.selectionWidth = undefined;
+    }
+    if (newHeight === null) {
+      editorState.selectionHeight = undefined;
+    }
     if (autoDetectMode.value === 'fixedSize') {
       reapplyAutoDetect();
     }

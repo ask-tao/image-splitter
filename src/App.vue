@@ -22,7 +22,7 @@
             <el-form-item label-width="80px" label="画布边距">
               <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
             </el-form-item>
-            <el-form-item label-width="80px" label="切割模式">
+            <el-form-item label-width="80px" label="分割模式">
               <el-radio-group v-model="slicingMode" size="small" class="slicing-mode-group">
                 <el-radio-button label="custom">框选</el-radio-button>
                 <el-radio-button label="grid">网格</el-radio-button>
@@ -108,8 +108,8 @@
               导出图片
             </el-button>
 
-            <el-divider>预览</el-divider>
-            <div class="preview-box checkerboard-bg">
+            <el-divider v-if="slicingMode === 'custom'">预览</el-divider>
+            <div class="preview-box checkerboard-bg" v-if="slicingMode === 'custom'">
               <canvas ref="previewCanvasRef"></canvas>
             </div>
           </div>
