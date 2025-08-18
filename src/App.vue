@@ -5,11 +5,20 @@
         <h1>智能图片分割工具</h1>
         <span class="version-tag">v{{ version }}</span>
       </div>
-      <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link">
-        <svg viewBox="0 0 1024 1024" width="28" height="28" fill="currentColor" style="vertical-align: middle;">
-          <path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>
-        </svg>
-      </a>
+      <div class="header-actions">
+        <el-switch
+          v-model="isDarkMode"
+          inline-prompt
+          :active-icon="Moon"
+          :inactive-icon="Sunny"
+          style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #f2f2f2;"
+        />
+        <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link">
+          <svg viewBox="0 0 1024 1024" width="28" height="28" fill="currentColor" style="vertical-align: middle;">
+            <path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>
+          </svg>
+        </a>
+      </div>
     </el-header>
     <el-container class="content-container">
       <el-aside width="350px" class="sidebar">
@@ -156,11 +165,13 @@
 </template>
 
 <script setup lang="ts">
-import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
+import { UploadFilled, Download, Delete, Sunny, Moon } from '@element-plus/icons-vue';
 import pkg from '../package.json';
 import { useImageEditor } from './composables/useImageEditor';
+import { useTheme } from './composables/useTheme';
 
 const version = pkg.version;
+const { isDarkMode } = useTheme();
 
 const {
   canvasRef,
@@ -212,9 +223,7 @@ body,
   padding: 0;
   background-color: #f4f4f5;
   display: flex;
-  /* Enable flexbox */
   flex-direction: column;
-  /* Stack children vertically */
 }
 
 .app-header {
@@ -243,6 +252,12 @@ body,
   font-weight: normal;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .github-link {
   color: #303133;
   text-decoration: none;
@@ -254,19 +269,23 @@ body,
   color: #606266;
 }
 
+.dark .checkerboard-bg {
+  background-image:
+    linear-gradient(45deg, #3e3e3e 25%, transparent 25%),
+    linear-gradient(135deg, #3e3e3e 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #3e3e3e 75%),
+    linear-gradient(135deg, transparent 75%, #3e3e3e 75%);
+}
+
 .main-content {
   padding: 10px;
-  /* Removed display: flex, justify-content, align-items */
   flex: 1;
-  /* Make it take available space */
   min-height: 0;
   min-width: min-content;
-  /* Allow it to shrink if content is too big */
 }
 
 .content-container {
   flex: 1;
-  /* Make it take remaining vertical space */
 }
 
 .canvas-card {
@@ -277,7 +296,7 @@ body,
   box-sizing: border-box;
 }
 
-.canvas-card>.el-card__body {
+.canvas-card > .el-card__body {
   width: 100%;
   height: 100%;
   display: flex;
@@ -285,28 +304,22 @@ body,
   overflow: auto;
 }
 
-/* Custom scrollbar styling for WebKit browsers (Chrome, Safari on macOS) */
-.canvas-card>.el-card__body::-webkit-scrollbar {
+.canvas-card > .el-card__body::-webkit-scrollbar {
   width: 10px;
-  /* Width of vertical scrollbar */
   height: 10px;
-  /* Height of horizontal scrollbar */
 }
 
-.canvas-card>.el-card__body::-webkit-scrollbar-track {
+.canvas-card > .el-card__body::-webkit-scrollbar-track {
   background: #f1f1f1;
-  /* Track color */
 }
 
-.canvas-card>.el-card__body::-webkit-scrollbar-thumb {
+.canvas-card > .el-card__body::-webkit-scrollbar-thumb {
   background: #888;
-  /* Handle color */
   border-radius: 5px;
 }
 
-.canvas-card>.el-card__body::-webkit-scrollbar-thumb:hover {
+.canvas-card > .el-card__body::-webkit-scrollbar-thumb:hover {
   background: #555;
-  /* Handle color on hover */
 }
 
 .canvas-placeholder {
@@ -321,7 +334,6 @@ body,
   align-items: center;
   background-color: #fff;
   z-index: 10;
-  /* Ensure it's above canvas */
   border: 1px dashed #dcdfe6;
   border-radius: 6px;
   cursor: pointer;
@@ -355,9 +367,7 @@ body,
 .editor-canvas {
   border: 1px dashed #dcdfe6;
   flex-shrink: 0;
-  /* Prevent shrinking */
   flex-grow: 0;
-  /* Prevent growing */
   margin: auto;
 }
 
@@ -376,7 +386,6 @@ body,
 
 .padding-input {
   width: 100px;
-  /* Adjust width as needed */
 }
 
 .action-buttons {
