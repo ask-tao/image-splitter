@@ -569,10 +569,19 @@ export function useImageEditor() {
     }
   });
 
+  // save last selection width and height for fixed size mode
+  let lastSelectionWidth: number | undefined;
+  let lastSelectionHeight: number | undefined;
   watch(autoDetectMode, (newMode, oldMode) => {
     if (newMode === 'padding') {
+      lastSelectionWidth = editorState.selectionWidth;
+      lastSelectionHeight = editorState.selectionHeight;
       editorState.selectionWidth = undefined;
       editorState.selectionHeight = undefined;
+    }
+    else if (newMode === 'fixedSize') {
+      editorState.selectionWidth = lastSelectionWidth;
+      editorState.selectionHeight = lastSelectionHeight;
     }
     // Only reapply auto-detect if the mode actually changed and it's not the initial setup
     if (newMode !== oldMode) {
