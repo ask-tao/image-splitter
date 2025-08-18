@@ -354,10 +354,50 @@ export function useImageEditor() {
         let newX = targetBox.x, newY = targetBox.y, newW = targetBox.w, newH = targetBox.h;
 
         switch (activeAnchor.value) {
-            case 'topLeft': { newX = currentX; newY = currentY; newW = originalX + originalW - currentX; newH = originalY + originalH - currentY; break; }
-            case 'topRight': { newW = currentX - originalX; newY = currentY; newH = originalY + originalH - currentY; break; }
-            case 'bottomLeft': { newX = currentX; newW = originalX + originalW - currentX; newH = currentY - originalY; break; }
-            case 'bottomRight': { newW = currentX - originalX; newH = currentY - originalY; break; }
+            case 'topLeft': {
+                newW = originalX + originalW - currentX;
+                newH = originalY + originalH - currentY;
+                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                    newH = newW / originalAspectRatio.value;
+                } else {
+                    newW = newH * originalAspectRatio.value;
+                }
+                newX = originalX + originalW - newW;
+                newY = originalY + originalH - newH;
+                break;
+            }
+            case 'topRight': {
+                newW = currentX - originalX;
+                newH = originalY + originalH - currentY;
+                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                    newH = newW / originalAspectRatio.value;
+                } else {
+                    newW = newH * originalAspectRatio.value;
+                }
+                newY = originalY + originalH - newH;
+                break;
+            }
+            case 'bottomLeft': {
+                newW = originalX + originalW - currentX;
+                newH = currentY - originalY;
+                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                    newH = newW / originalAspectRatio.value;
+                } else {
+                    newW = newH * originalAspectRatio.value;
+                }
+                newX = originalX + originalW - newW;
+                break;
+            }
+            case 'bottomRight': {
+                newW = currentX - originalX;
+                newH = currentY - originalY;
+                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                    newH = newW / originalAspectRatio.value;
+                } else {
+                    newW = newH * originalAspectRatio.value;
+                }
+                break;
+            }
             case 'topMiddle': { newY = currentY; newH = originalY + originalH - currentY; break; }
             case 'bottomMiddle': { newH = currentY - originalY; break; }
             case 'middleLeft': { newX = currentX; newW = originalX + originalW - currentX; break; }
