@@ -28,7 +28,7 @@
               @change="handleFileChange">
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text">
-                将图片文件拖到此处，或<em>点击上传</em>
+                将图片文件拖到此处，或<em>点击导入</em>
               </div>
             </el-upload>
 
@@ -142,7 +142,7 @@
             <input type="file" ref="fileInputRef" @change="onFileSelected" style="display: none" accept="image/*" />
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
-              将图片文件拖到此处，或<em>点击上传</em>
+              将图片文件拖到此处，或<em>点击导入</em>
             </div>
           </div>
           <!-- Context Menu -->
@@ -221,7 +221,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f5;
+  background-color: var(--el-bg-color);
   display: flex;
   flex-direction: column;
 }
@@ -230,8 +230,8 @@ body,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e4e7ed;
+  background-color: var(--el-bg-color-overlay);
+  border-bottom: 1px solid var(--el-border-color-light);
   padding: 0 20px;
 }
 
@@ -267,6 +267,14 @@ body,
 
 .github-link:hover {
   color: #606266;
+}
+
+.dark .github-link {
+  color: var(--el-text-color-regular);
+}
+
+.dark .github-link:hover {
+  color: var(--el-text-color-primary);
 }
 
 .dark .checkerboard-bg {
@@ -332,9 +340,9 @@ body,
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #fff;
+  background-color: var(--el-bg-color-overlay);
   z-index: 10;
-  border: 1px dashed #dcdfe6;
+  border: 1px dashed var(--el-border-color);
   border-radius: 6px;
   cursor: pointer;
 }
@@ -355,7 +363,7 @@ body,
 }
 
 .canvas-placeholder .el-upload__text em {
-  color: #409EFF;
+  color: var(--el-color-primary);
   font-style: normal;
 }
 
@@ -398,8 +406,8 @@ body,
 .preview-box {
   width: 100%;
   height: 200px;
-  background-color: #fff;
-  border: 1px solid #e4e7ed;
+  background-color: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
   border-radius: 4px;
   display: flex;
   justify-content: center;
@@ -434,7 +442,6 @@ body,
 }
 
 .checkerboard-bg {
-  background-color: #ffffff;
   background-image:
     linear-gradient(45deg, #eee 25%, transparent 25%),
     linear-gradient(135deg, #eee 25%, transparent 25%),
