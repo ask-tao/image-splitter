@@ -188,10 +188,36 @@ export function useImageEditor() {
     }
   });
 
-  watch(slicingMode, () => {
-    editorState.clearBoxes();
-    selectedBoxId.value = null;
-    editorState.clearGrid();
+  let isRevertingSlicingMode = false;
+  watch(slicingMode, (newMode, oldMode) => {
+    if (isRevertingSlicingMode) {
+      isRevertingSlicingMode = false;
+      return;
+    }
+    const hasWorkInProgress = editorState.boxes.length > 0 || editorState.gridArea;
+    if (!hasWorkInProgress) {
+      editorState.clearBoxes();
+      selectedBoxId.value = null;
+      editorState.clearGrid();
+      return;
+    }
+
+    ElMessageBox.confirm(
+      '切换分割模式将重置所有当前的选框或网格，确定要继续吗？',
+      '警告',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    ).then(() => {
+      editorState.clearBoxes();
+      selectedBoxId.value = null;
+      editorState.clearGrid();
+    }).catch(() => {
+      isRevertingSlicingMode = true;
+      slicingMode.value = oldMode;
+    });
   });
 
   watch([() => editorState.gridRows, () => editorState.gridCols], () => {
