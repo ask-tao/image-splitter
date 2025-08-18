@@ -353,14 +353,21 @@ export function useImageEditor() {
         const originalH = targetBox.h;
         let newX = targetBox.x, newY = targetBox.y, newW = targetBox.w, newH = targetBox.h;
 
+        if (e.shiftKey) {
+            // Update originalAspectRatio based on current box dimensions when Shift is pressed
+            originalAspectRatio.value = targetBox.w / targetBox.h;
+        }
+
         switch (activeAnchor.value) {
             case 'topLeft': {
                 newW = originalX + originalW - currentX;
                 newH = originalY + originalH - currentY;
-                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                    newH = newW / originalAspectRatio.value;
-                } else {
-                    newW = newH * originalAspectRatio.value;
+                if (e.shiftKey) {
+                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                        newH = newW / originalAspectRatio.value;
+                    } else {
+                        newW = newH * originalAspectRatio.value;
+                    }
                 }
                 newX = originalX + originalW - newW;
                 newY = originalY + originalH - newH;
@@ -369,10 +376,12 @@ export function useImageEditor() {
             case 'topRight': {
                 newW = currentX - originalX;
                 newH = originalY + originalH - currentY;
-                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                    newH = newW / originalAspectRatio.value;
-                } else {
-                    newW = newH * originalAspectRatio.value;
+                if (e.shiftKey) {
+                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                        newH = newW / originalAspectRatio.value;
+                    } else {
+                        newW = newH * originalAspectRatio.value;
+                    }
                 }
                 newY = originalY + originalH - newH;
                 break;
@@ -380,10 +389,12 @@ export function useImageEditor() {
             case 'bottomLeft': {
                 newW = originalX + originalW - currentX;
                 newH = currentY - originalY;
-                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                    newH = newW / originalAspectRatio.value;
-                } else {
-                    newW = newH * originalAspectRatio.value;
+                if (e.shiftKey) {
+                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                        newH = newW / originalAspectRatio.value;
+                    } else {
+                        newW = newH * originalAspectRatio.value;
+                    }
                 }
                 newX = originalX + originalW - newW;
                 break;
@@ -391,10 +402,12 @@ export function useImageEditor() {
             case 'bottomRight': {
                 newW = currentX - originalX;
                 newH = currentY - originalY;
-                if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-                    newH = newW / originalAspectRatio.value;
-                } else {
-                    newW = newH * originalAspectRatio.value;
+                if (e.shiftKey) {
+                    if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
+                        newH = newW / originalAspectRatio.value;
+                    } else {
+                        newW = newH * originalAspectRatio.value;
+                    }
                 }
                 break;
             }
