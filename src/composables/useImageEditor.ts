@@ -200,10 +200,12 @@ export function useImageEditor() {
   const setupCanvas = (img: HTMLImageElement) => {
     const canvas = canvasRef.value;
     if (!canvas) return;
+    ctxRef.value = canvas.getContext('2d'); // Ensure context is set
     canvas.width = img.width + canvasPadding.value * 2;
     canvas.height = img.height + canvasPadding.value * 2;
     canvas.style.width = `${canvas.width * (canvasZoom.value / 100)}px`;
     canvas.style.height = `${canvas.height * (canvasZoom.value / 100)}px`;
+    draw(); // Draw immediately after setup
   };
 
   watch(canvasPadding, (newPadding) => {
