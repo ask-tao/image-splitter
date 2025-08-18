@@ -1,7 +1,10 @@
 <template>
   <el-container class="app-container">
     <el-header class="app-header">
-      <h1>智能图片分割工具</h1>
+      <div class="header-title-group">
+        <h1>智能图片分割工具</h1>
+        <span class="version-tag">v{{ version }}</span>
+      </div>
       <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link">
         <svg viewBox="0 0 1024 1024" width="28" height="28" fill="currentColor" style="vertical-align: middle;">
           <path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>
@@ -154,7 +157,10 @@
 
 <script setup lang="ts">
 import { UploadFilled, Download, Delete } from '@element-plus/icons-vue';
+import pkg from '../package.json';
 import { useImageEditor } from './composables/useImageEditor';
+
+const version = pkg.version;
 
 const {
   canvasRef,
@@ -223,6 +229,18 @@ body,
 .app-header h1 {
   margin: 0;
   font-size: 20px;
+}
+
+.header-title-group {
+  display: flex;
+  align-items: baseline;
+}
+
+.version-tag {
+  font-size: 12px;
+  color: #909399;
+  margin-left: 8px;
+  font-weight: normal;
 }
 
 .github-link {
