@@ -15,6 +15,8 @@ export class ImageEditorState {
   gridArea: Box | null = null;
   gridRows: number = 2;
   gridCols: number = 2;
+  selectionWidth: number | undefined = 10;
+  selectionHeight: number | undefined = 10;
 
   constructor() {}
 
@@ -74,7 +76,7 @@ export class ImageEditorState {
     this.gridArea = null;
   }
 
-  autoDetect(imageData: ImageData, padding: number, canvasPadding: number): Box[] {
+  autoDetect(imageData: ImageData, padding: number, canvasPadding: number, fixedWidth?: number, fixedHeight?: number): Box[] {
     const { data, width, height } = imageData;
     const visited = new Uint8Array(width * height);
     const newBoxes: Box[] = [];
@@ -103,12 +105,21 @@ export class ImageEditorState {
             }
           }
         }
+
+        let boxW = (maxX - minX + 1) + padding * 2;
+        let boxH = (maxY - minY + 1) + padding * 2;
+
+        if (fixedWidth !== undefined && fixedHeight !== undefined) {
+          boxW = fixedWidth;
+          boxH = fixedHeight;
+        }
+
         newBoxes.push({
           id: Date.now() + newBoxes.length,
           x: minX - padding + canvasPadding,
           y: minY - padding + canvasPadding,
-          w: (maxX - minX + 1) + padding * 2,
-          h: (maxY - minY + 1) + padding * 2
+          w: boxW,
+          h: boxH
         });
       }
     }

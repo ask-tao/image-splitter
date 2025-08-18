@@ -34,6 +34,7 @@ export function useImageEditor() {
   const autoDetectPadding = ref(0);
   const exportPrefix = ref('sprite');
   const exportConnector = ref('_');
+  const autoDetectMode = ref<'padding' | 'fixedSize'>('padding');
 
   // Context Menu State
   const dropdownRef = ref<DropdownInstance | null>(null);
@@ -218,6 +219,14 @@ export function useImageEditor() {
       canvas.style.width = `${(editorState.sourceImage.width + canvasPadding.value * 2) * (newZoom / 100)}px`;
       canvas.style.height = `${(editorState.sourceImage.height + canvasPadding.value * 2) * (newZoom / 100)}px`;
     }
+  });
+
+  watch(autoDetectPadding, () => {
+    draw();
+  });
+
+  watch([() => editorState.selectionWidth, () => editorState.selectionHeight], () => {
+    draw();
   });
 
   // --- Event Handlers ---
@@ -530,7 +539,7 @@ export function useImageEditor() {
     }
   };
 
-  const handleAutoDetect = () => {
+  const reapplyAutoDetect = () => {
     const canvas = canvasRef.value;
     if (!canvas || !editorState.sourceImage) return;
     const tempCanvas = document.createElement('canvas');
@@ -540,9 +549,30 @@ export function useImageEditor() {
     tempCanvas.height = editorState.sourceImage.height;
     tempCtx.drawImage(editorState.sourceImage, 0, 0);
     const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-    editorState.autoDetect(imageData, autoDetectPadding.value, canvasPadding.value);
+
+    if (autoDetectMode.value === 'padding') {
+      editorState.autoDetect(imageData, autoDetectPadding.value, canvasPadding.value);
+    } else if (autoDetectMode.value === 'fixedSize') {
+      editorState.autoDetect(imageData, 0, canvasPadding.value, editorState.selectionWidth, editorState.selectionHeight);
+    }
+  };
+
+  const handleAutoDetect = () => {
+    reapplyAutoDetect();
     selectedBoxId.value = null;
   };
+
+  watch(autoDetectPadding, () => {
+    if (autoDetectMode.value === 'padding') {
+      reapplyAutoDetect();
+    }
+  });
+
+  watch([() => editorState.selectionWidth, () => editorState.selectionHeight], () => {
+    if (autoDetectMode.value === 'fixedSize') {
+      reapplyAutoDetect();
+    }
+  });
 
   const handleExport = async () => {
     try {
@@ -600,11 +630,13 @@ export function useImageEditor() {
     isMenuVisible,
     menuTop,
     menuLeft,
+    autoDetectMode,
 
     // Computed State
     fileNamePreview,
 
     // Core state (making it available to the view)
+    editorState,
     ...toRefs(editorState),
     selectedBoxId,
 

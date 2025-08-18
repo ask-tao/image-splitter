@@ -30,9 +30,31 @@
             </el-form-item>
 
             <div v-if="slicingMode === 'custom'">
-              <el-form-item label-width="auto" label="选框边距">
+              <el-form-item label-width="80px" label="识别模式">
+                <el-radio-group v-model="autoDetectMode" size="small" class="slicing-mode-group">
+                  <el-radio-button label="padding">内边距</el-radio-button>
+                  <el-radio-button label="fixedSize">固定宽高</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+
+              <el-form-item label-width="80px" label="框内边距" v-if="autoDetectMode === 'padding'">
                 <el-slider v-model="autoDetectPadding" :min="0" :max="20" :step="1" show-input size="small" />
               </el-form-item>
+
+              <div v-if="autoDetectMode === 'fixedSize'">
+                <el-row :gutter="10">
+                  <el-col :span="12">
+                    <el-form-item label="宽">
+                      <el-input-number v-model="editorState.selectionWidth" :min="1" :max="2000" size="small" style="width: 100%;" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="高">
+                      <el-input-number v-model="editorState.selectionHeight" :min="1" :max="2000" size="small" style="width: 100%;" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </div>
               <div class="action-buttons">
                 <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">自动识别</el-button>
                 <el-button type="danger" style="width: 100%;" @click="handleClearAll">
@@ -164,6 +186,8 @@ const {
   handleAutoDetect,
   handleClearAll,
   handleExport,
+  editorState,
+  autoDetectMode,
 } = useImageEditor();
 </script>
 
