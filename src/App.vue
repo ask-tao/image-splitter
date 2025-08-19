@@ -25,7 +25,7 @@
             inline-prompt
             :active-icon="Moon"
             :inactive-icon="Sunny"
-            style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #f2f2f2;"
+            style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #577fd8;"
           />
           <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link header-action-icon">
             <svg viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor">
@@ -162,6 +162,9 @@
           </el-card>
         </el-main>
       </el-container>
+      <el-footer class="app-footer">
+        <span>© 2025 Image Splitter</span>
+      </el-footer>
     </el-container>
   </el-config-provider>
 </template>
@@ -256,6 +259,29 @@ body,
   height: 55px;
 }
 
+html:not(.dark) .app-header {
+  background-color: #24292e;
+  border-bottom: 1px solid #24292e;
+}
+
+html:not(.dark) .app-header h1,
+html:not(.dark) .app-header .header-action-icon,
+html:not(.dark) .app-header .github-link {
+  color: white;
+}
+
+
+
+html:not(.dark) .app-header .header-action-icon:hover,
+html:not(.dark) .app-header .github-link:hover {
+  color: #f0f0f0;
+}
+
+.dark .app-header {
+  background-color: #141414;
+  border-bottom: 1px solid #303030;
+}
+
 .app-header h1 {
   margin: 0;
   font-size: 20px;
@@ -271,7 +297,7 @@ body,
 
 .version-tag {
   font-size: 12px;
-  color: var(--el-color-primary-light-5);
+  color: rgba(255, 255, 255, 0.8);
   margin-left: 8px;
   font-weight: normal;
 }
@@ -302,6 +328,25 @@ body,
 
 .github-link:hover {
   color: var(--el-color-primary-light-7);
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  color: white;
+}
+
+html:not(.dark) .app-footer {
+  background-color: #24292e;
+  border-top: 1px solid #24292e;
+}
+
+.dark .app-footer {
+  background-color: #141414;
+  border-top: 1px solid #303030;
 }
 
 .dark .checkerboard-bg {
