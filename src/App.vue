@@ -10,7 +10,9 @@
           <el-dropdown @command="handleLanguageChange" trigger="click">
             <span class="el-dropdown-link header-action-icon">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path>
+                <path
+                  d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z">
+                </path>
               </svg>
             </span>
             <template #dropdown>
@@ -20,16 +22,14 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-switch
-            v-model="isDarkMode"
-            inline-prompt
-            :active-icon="Moon"
-            :inactive-icon="Sunny"
-            style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #577fd8;"
-          />
-          <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link header-action-icon">
+          <el-switch v-model="isDarkMode" inline-prompt :active-icon="Moon" :inactive-icon="Sunny"
+            style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #577fd8;" />
+          <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer"
+            class="github-link header-action-icon">
             <svg viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor">
-              <path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>
+              <path
+                d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z">
+              </path>
             </svg>
           </a>
         </div>
@@ -66,7 +66,8 @@
                   </el-radio-group>
                 </el-form-item>
 
-                <el-form-item :label-width="labelWidth" :label="$t('sidebar.boxPadding')" v-if="autoDetectMode === 'padding'">
+                <el-form-item :label-width="labelWidth" :label="$t('sidebar.boxPadding')"
+                  v-if="autoDetectMode === 'padding'">
                   <el-slider v-model="autoDetectPadding" :min="0" :max="20" :step="1" show-input size="small" />
                 </el-form-item>
 
@@ -74,20 +75,25 @@
                   <el-row :gutter="10">
                     <el-col :span="12">
                       <el-form-item :label="$t('sidebar.width')">
-                        <el-input-number v-model="editorState.selectionWidth" :min="1" :max="2000" size="small" style="width: 100%;" />
+                        <el-input-number v-model="editorState.selectionWidth" :min="1" :max="2000" size="small"
+                          style="width: 100%;" />
                       </el-form-item>
                     </el-col>
                     <el-col :span="12">
                       <el-form-item :label="$t('sidebar.height')">
-                        <el-input-number v-model="editorState.selectionHeight" :min="1" :max="2000" size="small" style="width: 100%;" />
+                        <el-input-number v-model="editorState.selectionHeight" :min="1" :max="2000" size="small"
+                          style="width: 100%;" />
                       </el-form-item>
                     </el-col>
                   </el-row>
                 </div>
                 <div class="action-buttons">
-                  <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">{{ $t('sidebar.autoDetect') }}</el-button>
+                  <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">{{ $t('sidebar.autoDetect')
+                  }}</el-button>
                   <el-button type="danger" style="width: 100%;" @click="handleClearAll">
-                    <el-icon><Delete /></el-icon>
+                    <el-icon>
+                      <Delete />
+                    </el-icon>
                     {{ $t('sidebar.clearBoxes') }}
                   </el-button>
                 </div>
@@ -107,8 +113,11 @@
                   </el-col>
                 </el-row>
                 <div class="action-buttons">
-                  <el-button type="primary" style="width: 100%;" @click="fitGridToImage">{{ $t('sidebar.generateGrid') }}</el-button>
-                  <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon><Delete /></el-icon>{{ $t('sidebar.clearGrid') }}</el-button>
+                  <el-button type="primary" style="width: 100%;" @click="fitGridToImage">{{ $t('sidebar.generateGrid')
+                  }}</el-button>
+                  <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon>
+                      <Delete />
+                    </el-icon>{{ $t('sidebar.clearGrid') }}</el-button>
                 </div>
               </div>
 
@@ -127,7 +136,9 @@
                 {{ $t('sidebar.fileNamePreview') }} {{ fileNamePreview }}
               </el-text>
               <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
-                <el-icon><Download /></el-icon>
+                <el-icon>
+                  <Download />
+                </el-icon>
                 {{ $t('sidebar.exportImages') }}
               </el-button>
 
@@ -143,10 +154,6 @@
             <canvas ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
               @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
               @contextmenu.prevent="onRightClick"></canvas>
-            <el-upload v-if="!sourceImage" class="canvas-placeholder" drag action="#" :show-file-list="false" :auto-upload="false" @change="handleFileChange" @drop.prevent @dragover.prevent>
-                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                <div class="el-upload__text" v-html="$t('upload.main')"></div>
-            </el-upload>
             <div v-if="isMenuVisible"
               :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
               <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
@@ -154,11 +161,17 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item :command="'sendToBack'">{{ $t('contextMenu.sendToBack') }}</el-dropdown-item>
-                    <el-dropdown-item :command="'deleteBox'" divided class="context-menu-item-danger">{{ $t('contextMenu.deleteBox') }}</el-dropdown-item>
+                    <el-dropdown-item :command="'deleteBox'" divided class="context-menu-item-danger">{{
+                      $t('contextMenu.deleteBox') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
             </div>
+            <el-upload v-if="!sourceImage" class="canvas-placeholder" drag action="#" :show-file-list="false"
+              :auto-upload="false" @change="handleFileChange" @drop.prevent @dragover.prevent>
+              <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+              <div class="el-upload__text" v-html="$t('upload.main')"></div>
+            </el-upload>
           </el-card>
         </el-main>
       </el-container>
@@ -376,7 +389,7 @@ html:not(.dark) .app-footer {
   box-sizing: border-box;
 }
 
-.canvas-card > .el-card__body {
+.canvas-card>.el-card__body {
   width: 100%;
   height: 100%;
   display: flex;
@@ -384,21 +397,21 @@ html:not(.dark) .app-footer {
   overflow: auto;
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar {
+.canvas-card>.el-card__body::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar-track {
+.canvas-card>.el-card__body::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar-thumb {
+.canvas-card>.el-card__body::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 5px;
 }
 
-.canvas-card > .el-card__body::-webkit-scrollbar-thumb:hover {
+.canvas-card>.el-card__body::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
@@ -412,11 +425,15 @@ html:not(.dark) .app-footer {
 
 .canvas-placeholder .el-upload-dragger {
     width: 100%;
-    height: 100%;
+    height: 792.5px; /** 100%不生效，估计是组件内部约束，只能写死 */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.canvas-placeholder .el-icon--upload {
+  margin: 0;
 }
 
 .editor-canvas {
