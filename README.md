@@ -1,6 +1,18 @@
-# 智能图片分割工具 (Image Split)
+<div align="center">
 
-## 1. 项目介绍
+[![doocs-md](public/logo.svg)](https://github.com/doocs/md)
+
+</div>
+
+<h1 align="center" style="font-family: 'Roboto Slab', serif;">Image Splitter</h1>
+
+<div align="center">
+
+![Node.js](https://img.shields.io/badge/Node.js-16.x%2B-brightgreen) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white) ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite&logoColor=white)  ![Element Plus](https://img.shields.io/badge/Element--Plus-409EFF?logo=element-plus&logoColor=white)
+
+</div>
+
+## 项目介绍
 
 这是一个基于Web技术的图片分割工具，**`100%`由作者和`Gemini`共创生成。**
 
@@ -8,7 +20,7 @@
 
 本工具完全在浏览器端**本地运行**，保证了素材的安全性。
 
-## 2. 项目特点
+## 功能特性
 
 - **分割模式**:
     - **手动模式**: 支持用鼠标拖拽，在任意位置创建、移动、缩放选框。支持按住 `Shift` 键保持纵横比缩放。
@@ -27,7 +39,7 @@
 
 - **导出功能**: 一键将所有选框内的图片打包成一个 `.zip` 压缩文件供下载。支持自定义导出文件名的`前缀`和`连接符`。
 
-## 3. 技术方案及其原理
+## 技术方案及其原理
 
 本工具主要采用现代前端技术栈构建，核心原理围绕 `Canvas` 的像素级操作和图像处理算法。
 

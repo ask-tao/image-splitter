@@ -172,7 +172,7 @@
         </el-main>
       </el-container>
       <el-footer class="app-footer">
-        <span>MIT License © 2025 AskTao | <span>imgsplit v{{ version }}</span></span>
+        <span>MIT License © 2025 AskTao | <span>Image Splitter v{{ version }}</span></span>
         <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer"
           class="github-link footer-github-icon">
           <svg viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" v-html="githubSvgPath"></svg>
@@ -302,6 +302,8 @@ html:not(.dark) .app-header .github-link:hover {
   font-size: 20px;
   white-space: nowrap;
   color: var(--el-color-white);
+  font-family: 'Roboto Slab', serif;
+  font-weight: 700;
 }
 
 .header-title-group {
