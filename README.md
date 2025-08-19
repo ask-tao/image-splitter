@@ -20,6 +20,8 @@
 
 本工具完全在浏览器端**本地运行**，保证了素材的安全性。
 
+下载地址：[历史版本](https://github.com/ask-tao/image-splitter/releases)
+
 ## 功能特性
 
 - **分割模式**:
