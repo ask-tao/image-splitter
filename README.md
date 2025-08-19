@@ -38,6 +38,7 @@
     ![Screenshot](doc/image/split_mode.png)
 
         - **行列设置**:
+  
         ![Screenshot](doc/image/grid_mode.png)
 
 - **编辑操作**: 支持选中、移动、删除选框，并支持通过8个锚点进行缩放。
