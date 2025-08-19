@@ -3,7 +3,18 @@
     <el-container class="app-container">
       <el-header class="app-header">
         <div class="header-title-group">
-          <img :src="logoSvgUrl" alt="Logo" class="header-logo">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="header-logo">
+            <defs>
+              <linearGradient id="globalGrad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#41D1FF"></stop>
+                <stop offset="100%" stop-color="#BD34FE"></stop>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+            <rect x="102" y="0" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+            <rect x="0" y="102" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+            <rect x="102" y="102" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+          </svg>
           <h1>{{ $t('header.title') }}</h1>
         </div>
         <div class="header-actions">
@@ -189,7 +200,6 @@ import { UploadFilled, Download, Delete, Sunny, Moon } from '@element-plus/icons
 import enLocale from 'element-plus/dist/locale/en.mjs';
 import zhCnLocale from 'element-plus/dist/locale/zh-cn.mjs';
 import pkg from '../package.json';
-import logoSvgUrl from '/public/logo.svg'; // Import the SVG as a URL
 import { useImageEditor } from './composables/useImageEditor';
 import { useTheme } from './composables/useTheme';
 

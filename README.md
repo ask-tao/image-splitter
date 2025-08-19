@@ -1,6 +1,6 @@
 <div align="center">
 
-[![doocs-md](public/logo.svg)](https://github.com/doocs/md)
+[![doocs-md](doc/image/logo.svg)](https://github.com/ask-tao/image-splitter)
 
 </div>
 
@@ -8,7 +8,7 @@
 
 <div align="center">
 
-![Node.js](https://img.shields.io/badge/Node.js-16.x%2B-brightgreen) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white) ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite&logoColor=white)  ![Element Plus](https://img.shields.io/badge/Element--Plus-409EFF?logo=element-plus&logoColor=white)
+![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white) ![Element Plus](https://img.shields.io/badge/Element--Plus-409EFF?logo=element-plus&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite&logoColor=white)  ![Node.js](https://img.shields.io/badge/Node.js-16.x%2B-brightgreen) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 
 </div>
 
@@ -25,12 +25,13 @@
 - **分割模式**:
     - **框选模式**: 支持**自动识别**和用鼠标拖拽创建选框。在任意位置创建、移动、缩放选框。支持按住 `Shift` 键保持纵横比缩放。
     ![Screenshot](doc/image/box_mode.png)
-        - **支持内边距和固定宽高模式**
+        - **内边距模式**:
         ![Screenshot](doc/image/padding_mode.png) 
+        - **固定宽高模式**:
         ![Screenshot](doc/image/fixed_mode.png)
     - **网格模式**: 通过定义一个可缩放的网格区域及行列数，快速进行均匀的网格分割。
     ![Screenshot](doc/image/split_mode.png)
-        - **支持设置行列**
+        - **行列设置**:
         ![Screenshot](doc/image/grid_mode.png)
 - **编辑操作**: 支持选中、移动、删除选框，并支持通过8个锚点进行缩放。
 - **画布控制**: 支持画布的缩放和全局外边距调整。
@@ -99,6 +100,8 @@
     npm run build-single
     ```
     构建后的文件将生成在 `dist-single` 目录下，在浏览器打开`index.html`即可使用。
+
+    > 可在Github`Releases`中下载可运行的html单文件
 
 ## 后续计划
 - 打包发布桌面版软件
