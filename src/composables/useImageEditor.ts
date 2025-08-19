@@ -3,9 +3,9 @@ import type { UploadFile, DropdownInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { ImageEditorState, type Box } from '../core/ImageEditorState';
 
-export function useImageEditor() {
+export function useImageEditor(t: (key: string) => string) {
   // --- Core State ---
-  const editorState = reactive(new ImageEditorState());
+  const editorState = reactive(new ImageEditorState(t));
 
   // --- UI State ---
   const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -266,7 +266,7 @@ export function useImageEditor() {
     };
 
     if (editorState.sourceImage) {
-      ElMessageBox.confirm('这会替换掉当前图片和所有选框，是否继续？', '警告', {
+      ElMessageBox.confirm(t('messages.replaceConfirmMsg'), t('messages.replaceConfirmTitle'), {
         confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
       }).then(performLoad).catch(() => { });
     } else {
@@ -587,7 +587,7 @@ export function useImageEditor() {
   const handleClearAll = () => {
     if (slicingMode.value === 'custom') {
       if (editorState.boxes.length === 0) return;
-      ElMessageBox.confirm('此操作将清除所有手动和自动生成的选框，是否继续？', '警告', {
+      ElMessageBox.confirm(t('messages.clearAllConfirmMsg'), t('messages.clearAllConfirmTitle'), {
         confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
       }).then(() => {
         editorState.clearBoxes();
@@ -673,7 +673,7 @@ export function useImageEditor() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error: any) {
-      ElMessageBox.alert(error.message, '导出失败', { type: 'error' });
+      ElMessageBox.alert(error.message, t('messages.exportErrorTitle'), { type: 'error' });
     }
   };
 

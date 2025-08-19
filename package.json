@@ -8,17 +8,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.18",
     "element-plus": "^2.7.7",
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "vue": "^3.5.18",
+    "vue-i18n": "^11.1.11"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
     "typescript": "~5.8.3",
-    "vite": "^7.1.2",
-    "vue-tsc": "^3.0.5",
     "unplugin-auto-import": "^0.18.2",
-    "unplugin-vue-components": "^0.27.3"
+    "unplugin-vue-components": "^0.27.3",
+    "vite": "^7.1.2",
+    "vue-tsc": "^3.0.5"
   }
 }

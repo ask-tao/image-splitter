@@ -1,177 +1,197 @@
 <template>
-  <el-container class="app-container">
-    <el-header class="app-header">
-      <div class="header-title-group">
-        <h1>智能图片分割工具</h1>
-        <span class="version-tag">v{{ version }}</span>
-      </div>
-      <div class="header-actions">
-        <el-switch
-          v-model="isDarkMode"
-          inline-prompt
-          :active-icon="Moon"
-          :inactive-icon="Sunny"
-          style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #f2f2f2;"
-        />
-        <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link">
-          <svg viewBox="0 0 1024 1024" width="28" height="28" fill="currentColor" style="vertical-align: middle;">
-            <path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>
-          </svg>
-        </a>
-      </div>
-    </el-header>
-    <el-container class="content-container">
-      <el-aside width="350px" class="sidebar">
-        <el-card shadow="always">
-          <div class="control-panel">
-            <el-upload class="upload-control" drag action="#" :show-file-list="false" :auto-upload="false"
-              @change="handleFileChange">
-              <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-              <div class="el-upload__text">
-                将图片文件拖到此处，或<em>点击导入</em>
-              </div>
-            </el-upload>
+  <el-config-provider :locale="currentLocale">
+    <el-container class="app-container">
+      <el-header class="app-header">
+        <div class="header-title-group">
+          <h1>{{ $t('header.title') }}</h1>
+          <span class="version-tag">v{{ version }}</span>
+        </div>
+        <div class="header-actions">
+          <el-dropdown @command="handleLanguageChange" trigger="click">
+            <span class="el-dropdown-link header-action-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path>
+              </svg>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="zh-CN" :disabled="locale === 'zh-CN'">简体中文</el-dropdown-item>
+                <el-dropdown-item command="en" :disabled="locale === 'en'">English</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-switch
+            v-model="isDarkMode"
+            inline-prompt
+            :active-icon="Moon"
+            :inactive-icon="Sunny"
+            style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #f2f2f2;"
+          />
+          <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer" class="github-link header-action-icon">
+            <svg viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor">
+              <path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>
+            </svg>
+          </a>
+        </div>
+      </el-header>
+      <el-container class="content-container">
+        <el-aside width="350px" class="sidebar">
+          <el-card shadow="always">
+            <div class="control-panel">
+              <el-upload class="upload-control" drag action="#" :show-file-list="false" :auto-upload="false"
+                @change="handleFileChange">
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text" v-html="$t('upload.main')"></div>
+              </el-upload>
 
-            <el-divider>编辑</el-divider>
-            <el-form-item label-width="80px" label="画布缩放">
-              <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
-            </el-form-item>
-            <el-form-item label-width="80px" label="画布边距">
-              <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
-            </el-form-item>
-            <el-form-item label-width="80px" label="分割模式">
-              <el-radio-group v-model="slicingMode" size="small" class="slicing-mode-group">
-                <el-radio-button label="custom">框选</el-radio-button>
-                <el-radio-button label="grid">网格</el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-
-            <div v-if="slicingMode === 'custom'">
-              <el-form-item label-width="80px" label="识别模式">
-                <el-radio-group v-model="autoDetectMode" size="small" class="slicing-mode-group">
-                  <el-radio-button label="padding">内边距</el-radio-button>
-                  <el-radio-button label="fixedSize">固定宽高</el-radio-button>
+              <el-divider>{{ $t('sidebar.edit') }}</el-divider>
+              <el-form-item :label-width="labelWidth" :label="$t('sidebar.canvasZoom')">
+                <el-slider v-model="canvasZoom" :min="10" :max="400" :step="10" show-input size="small" />
+              </el-form-item>
+              <el-form-item :label-width="labelWidth" :label="$t('sidebar.canvasPadding')">
+                <el-slider v-model="canvasPadding" :min="0" :max="100" show-input size="small" />
+              </el-form-item>
+              <el-form-item :label-width="labelWidth" :label="$t('sidebar.slicingMode')">
+                <el-radio-group v-model="slicingMode" size="small" class="slicing-mode-group">
+                  <el-radio-button label="custom">{{ $t('sidebar.slicingModes.custom') }}</el-radio-button>
+                  <el-radio-button label="grid">{{ $t('sidebar.slicingModes.grid') }}</el-radio-button>
                 </el-radio-group>
               </el-form-item>
 
-              <el-form-item label-width="80px" label="框内边距" v-if="autoDetectMode === 'padding'">
-                <el-slider v-model="autoDetectPadding" :min="0" :max="20" :step="1" show-input size="small" />
-              </el-form-item>
+              <div v-if="slicingMode === 'custom'">
+                <el-form-item :label-width="labelWidth" :label="$t('sidebar.recognitionMode')">
+                  <el-radio-group v-model="autoDetectMode" size="small" class="slicing-mode-group">
+                    <el-radio-button label="padding">{{ $t('sidebar.recognitionModes.padding') }}</el-radio-button>
+                    <el-radio-button label="fixedSize">{{ $t('sidebar.recognitionModes.fixedSize') }}</el-radio-button>
+                  </el-radio-group>
+                </el-form-item>
 
-              <div v-if="autoDetectMode === 'fixedSize'">
+                <el-form-item :label-width="labelWidth" :label="$t('sidebar.boxPadding')" v-if="autoDetectMode === 'padding'">
+                  <el-slider v-model="autoDetectPadding" :min="0" :max="20" :step="1" show-input size="small" />
+                </el-form-item>
+
+                <div v-if="autoDetectMode === 'fixedSize'">
+                  <el-row :gutter="10">
+                    <el-col :span="12">
+                      <el-form-item :label="$t('sidebar.width')">
+                        <el-input-number v-model="editorState.selectionWidth" :min="1" :max="2000" size="small" style="width: 100%;" />
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('sidebar.height')">
+                        <el-input-number v-model="editorState.selectionHeight" :min="1" :max="2000" size="small" style="width: 100%;" />
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                </div>
+                <div class="action-buttons">
+                  <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">{{ $t('sidebar.autoDetect') }}</el-button>
+                  <el-button type="danger" style="width: 100%;" @click="handleClearAll">
+                    <el-icon><Delete /></el-icon>
+                    {{ $t('sidebar.clearBoxes') }}
+                  </el-button>
+                </div>
+              </div>
+
+              <div v-if="slicingMode === 'grid'">
                 <el-row :gutter="10">
                   <el-col :span="12">
-                    <el-form-item label="宽">
-                      <el-input-number v-model="editorState.selectionWidth" :min="1" :max="2000" size="small" style="width: 100%;" />
+                    <el-form-item :label="$t('sidebar.rows')">
+                      <el-input-number v-model="gridRows" :min="1" :max="100" size="small" style="width: 100%" />
                     </el-form-item>
                   </el-col>
                   <el-col :span="12">
-                    <el-form-item label="高">
-                      <el-input-number v-model="editorState.selectionHeight" :min="1" :max="2000" size="small" style="width: 100%;" />
+                    <el-form-item :label="$t('sidebar.cols')">
+                      <el-input-number v-model="gridCols" :min="1" :max="100" size="small" style="width: 100%" />
                     </el-form-item>
                   </el-col>
                 </el-row>
+                <div class="action-buttons">
+                  <el-button type="primary" style="width: 100%;" @click="fitGridToImage">{{ $t('sidebar.generateGrid') }}</el-button>
+                  <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon><Delete /></el-icon>{{ $t('sidebar.clearGrid') }}</el-button>
+                </div>
               </div>
-              <div class="action-buttons">
-                <el-button type="primary" style="width: 100%;" @click="handleAutoDetect">自动识别</el-button>
-                <el-button type="danger" style="width: 100%;" @click="handleClearAll">
-                  <el-icon>
-                    <Delete />
-                  </el-icon>
-                  清除选框
-                </el-button>
-              </div>
-            </div>
 
-            <div v-if="slicingMode === 'grid'">
+              <el-divider>{{ $t('sidebar.export') }}</el-divider>
               <el-row :gutter="10">
-                <el-col :span="12">
-                  <el-form-item label="行数">
-                    <el-input-number v-model="gridRows" :min="1" :max="100" size="small" style="width: 100%" />
-                  </el-form-item>
+                <el-col :span="18">
+                  <el-input v-model="exportPrefix" :placeholder="$t('sidebar.fileNamePrefix')">
+                    <template #prepend>{{ $t('sidebar.prefix') }}</template>
+                  </el-input>
                 </el-col>
-                <el-col :span="12">
-                  <el-form-item label="列数">
-                    <el-input-number v-model="gridCols" :min="1" :max="100" size="small" style="width: 100%" />
-                  </el-form-item>
+                <el-col :span="6">
+                  <el-input v-model="exportConnector" :placeholder="$t('sidebar.connector')" />
                 </el-col>
               </el-row>
-              <div class="action-buttons">
-                <el-button type="primary" style="width: 100%;" @click="fitGridToImage">生成网格</el-button>
-                <el-button type="danger" style="width: 100%;" @click="clearGrid"><el-icon>
-                    <Delete />
-                  </el-icon>清除网格</el-button>
+              <el-text type="info" size="small" style="margin-top: 5px; display: block;">
+                {{ $t('sidebar.fileNamePreview') }} {{ fileNamePreview }}
+              </el-text>
+              <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
+                <el-icon><Download /></el-icon>
+                {{ $t('sidebar.exportImages') }}
+              </el-button>
+
+              <el-divider v-if="slicingMode === 'custom'">{{ $t('sidebar.preview') }}</el-divider>
+              <div class="preview-box checkerboard-bg" v-if="slicingMode === 'custom'">
+                <canvas ref="previewCanvasRef"></canvas>
               </div>
             </div>
-
-            <el-divider>导出</el-divider>
-            <el-row :gutter="10">
-              <el-col :span="18">
-                <el-input v-model="exportPrefix" placeholder="请输入文件名前缀">
-                  <template #prepend>前缀</template>
-                </el-input>
-              </el-col>
-              <el-col :span="6">
-                <el-input v-model="exportConnector" placeholder="连接符" />
-              </el-col>
-            </el-row>
-            <el-text type="info" size="small" style="margin-top: 5px; display: block;">
-              预览: {{ fileNamePreview }}
-            </el-text>
-            <el-button type="success" style="width: 100%; margin-top: 10px;" @click="handleExport">
-              <el-icon>
-                <Download />
-              </el-icon>
-              导出图片
-            </el-button>
-
-            <el-divider v-if="slicingMode === 'custom'">预览</el-divider>
-            <div class="preview-box checkerboard-bg" v-if="slicingMode === 'custom'">
-              <canvas ref="previewCanvasRef"></canvas>
+          </el-card>
+        </el-aside>
+        <el-main class="main-content">
+          <el-card shadow="always" class="canvas-card">
+            <canvas ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
+              @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
+              @contextmenu.prevent="onRightClick"></canvas>
+            <el-upload v-if="!sourceImage" class="canvas-placeholder" drag action="#" :show-file-list="false" :auto-upload="false" @change="handleFileChange" @drop.prevent @dragover.prevent>
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text" v-html="$t('upload.main')"></div>
+            </el-upload>
+            <div v-if="isMenuVisible"
+              :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
+              <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
+                <span class="el-dropdown-link"></span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item :command="'sendToBack'">{{ $t('contextMenu.sendToBack') }}</el-dropdown-item>
+                    <el-dropdown-item :command="'deleteBox'" divided class="context-menu-item-danger">{{ $t('contextMenu.deleteBox') }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </div>
-          </div>
-        </el-card>
-      </el-aside>
-      <el-main class="main-content">
-        <el-card shadow="always" class="canvas-card">
-          <canvas ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
-            @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
-            @contextmenu.prevent="onRightClick"></canvas>
-          <div v-if="!sourceImage" class="canvas-placeholder" @drop.prevent="onDrop" @dragover.prevent
-            @click="onCanvasPlaceholderClick">
-            <input type="file" ref="fileInputRef" @change="onFileSelected" style="display: none" accept="image/*" />
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">
-              将图片文件拖到此处，或<em>点击导入</em>
-            </div>
-          </div>
-          <!-- Context Menu -->
-          <div v-if="isMenuVisible"
-            :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
-            <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
-              <span class="el-dropdown-link"></span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="sendToBack">层级置底</el-dropdown-item>
-                  <el-dropdown-item command="deleteBox" divided class="context-menu-item-danger">删除选框</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </el-card>
-      </el-main>
+          </el-card>
+        </el-main>
+      </el-container>
     </el-container>
-  </el-container>
+  </el-config-provider>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { UploadFilled, Download, Delete, Sunny, Moon } from '@element-plus/icons-vue';
+import enLocale from 'element-plus/dist/locale/en.mjs';
+import zhCnLocale from 'element-plus/dist/locale/zh-cn.mjs';
 import pkg from '../package.json';
 import { useImageEditor } from './composables/useImageEditor';
 import { useTheme } from './composables/useTheme';
 
+const { t, locale } = useI18n();
 const version = pkg.version;
 const { isDarkMode } = useTheme();
+
+const labelWidth = computed(() => (locale.value === 'zh-CN' ? '80px' : '110px'));
+
+const currentLocale = computed(() => {
+  return locale.value === 'zh-CN' ? zhCnLocale : enLocale;
+});
+
+const handleLanguageChange = (lang: string) => {
+  if (lang) {
+    locale.value = lang;
+    localStorage.setItem('lang', lang);
+  }
+};
 
 const {
   canvasRef,
@@ -210,7 +230,7 @@ const {
   handleExport,
   editorState,
   autoDetectMode,
-} = useImageEditor();
+} = useImageEditor(t);
 </script>
 
 <style>
@@ -230,24 +250,28 @@ body,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--el-bg-color-overlay);
-  border-bottom: 1px solid var(--el-border-color-light);
+  background-color: var(--el-color-primary);
+  border-bottom: 1px solid var(--el-color-primary-light-3);
   padding: 0 20px;
+  height: 55px;
 }
 
 .app-header h1 {
   margin: 0;
   font-size: 20px;
+  white-space: nowrap;
+  color: var(--el-color-white);
 }
 
 .header-title-group {
   display: flex;
   align-items: baseline;
+  overflow: hidden;
 }
 
 .version-tag {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-color-primary-light-5);
   margin-left: 8px;
   font-weight: normal;
 }
@@ -258,23 +282,26 @@ body,
   gap: 16px;
 }
 
+.header-action-icon {
+  color: var(--el-color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.header-action-icon:hover {
+  color: var(--el-color-primary-light-7);
+}
+
 .github-link {
-  color: #303133;
+  color: var(--el-color-white);
   text-decoration: none;
   display: flex;
   align-items: center;
 }
 
 .github-link:hover {
-  color: #606266;
-}
-
-.dark .github-link {
-  color: var(--el-text-color-regular);
-}
-
-.dark .github-link:hover {
-  color: var(--el-text-color-primary);
+  color: var(--el-color-primary-light-7);
 }
 
 .dark .checkerboard-bg {
@@ -336,44 +363,19 @@ body,
   left: 20px;
   right: 20px;
   bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--el-bg-color-overlay);
-  z-index: 10;
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.canvas-placeholder:hover {
-  border-color: #409EFF;
-}
-
-.canvas-placeholder .el-icon--upload {
-  font-size: 67px;
-  color: #C0C4CC;
-  margin: 0;
-}
-
-.canvas-placeholder .el-upload__text {
-  color: #606266;
-  font-size: 14px;
-}
-
-.canvas-placeholder .el-upload__text em {
-  color: var(--el-color-primary);
-  font-style: normal;
 }
 
 .canvas-placeholder .el-upload-dragger {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .editor-canvas {
-  border: 1px dashed #dcdfe6;
+  border: 1px dashed var(--el-border-color);
   flex-shrink: 0;
   flex-grow: 0;
   margin: auto;
@@ -385,7 +387,7 @@ body,
 
 .control-panel .el-divider__text {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .control-panel .el-form-item {
@@ -452,8 +454,8 @@ body,
 }
 
 .context-menu-item-danger.el-dropdown-menu__item:hover {
-  background-color: #fef0f0;
-  color: #f56c6c;
+  background-color: var(--el-color-danger-light-9);
+  color: var(--el-color-danger);
 }
 
 .slicing-mode-group {

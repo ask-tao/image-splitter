@@ -1,0 +1,56 @@
+{
+  "header": {
+    "title": "Image Splitting Tool"
+  },
+  "upload": {
+    "main": "Drag file here or <em>click to upload</em>"
+  },
+  "sidebar": {
+    "edit": "Edit",
+    "canvasZoom": "Zoom",
+    "canvasPadding": "Margin",
+    "slicingMode": "Slicing",
+    "slicingModes": {
+      "custom": "Box",
+      "grid": "Grid"
+    },
+    "recognitionMode": "Recognition",
+    "recognitionModes": {
+      "padding": "Padding",
+      "fixedSize": "Fixed Size"
+    },
+    "boxPadding": "Box Padding",
+    "width": "Width",
+    "height": "Height",
+    "autoDetect": "Generate Boxes",
+    "clearBoxes": "Clear Boxes",
+    "rows": "Rows",
+    "cols": "Cols",
+    "generateGrid": "Generate Grid",
+    "clearGrid": "Clear Grid",
+    "export": "Export",
+    "fileNamePrefix": "Enter file prefix",
+    "prefix": "Prefix",
+    "connector": "Connector",
+    "fileNamePreview": "Preview:",
+    "exportImages": "Export Images",
+    "preview": "Preview"
+  },
+  "contextMenu": {
+    "sendToBack": "Send to Back",
+    "deleteBox": "Delete Box"
+  },
+  "messages": {
+    "replaceConfirmTitle": "Warning",
+    "replaceConfirmMsg": "This will replace the current image and all selection boxes. Continue?",
+    "clearAllConfirmTitle": "Warning",
+    "clearAllConfirmMsg": "This will clear all manual and auto-detected boxes. Continue?",
+    "exportErrorTitle": "Export Failed"
+  },
+  "errors": {
+    "noSource": "No source image to export.",
+    "noBoxes": "No boxes to export in custom mode.",
+    "noGrid": "No grid area to export in grid mode.",
+    "noContent": "No content to export."
+  }
+}

@@ -1,4 +1,3 @@
-
 import JSZip from 'jszip';
 
 export interface Box {
@@ -18,7 +17,11 @@ export class ImageEditorState {
   selectionWidth: number | undefined = undefined;
   selectionHeight: number | undefined = undefined;
 
-  constructor() {}
+  private t: (key: string) => string;
+
+  constructor(t: (key: string) => string) {
+    this.t = t;
+  }
 
   async loadImage(file: File): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
@@ -106,26 +109,17 @@ export class ImageEditorState {
           }
         }
 
-        console.log(`Detected object: minX=${minX}, minY=${minY}, maxX=${maxX}, maxY=${maxY}`);
-
         let boxW = (maxX - minX + 1) + padding * 2;
         let boxH = (maxY - minY + 1) + padding * 2;
 
-        console.log('shouldSetFixedSize:', shouldSetFixedSize);
-        console.log('Initial selectionWidth:', this.selectionWidth, 'selectionHeight:', this.selectionHeight);
-        console.log('Detected boxW:', boxW, 'boxH:', boxH);
-
         if (shouldSetFixedSize && (this.selectionWidth == null || this.selectionHeight == null)) {
-          console.log('Condition met: Setting selectionWidth/Height');
           this.selectionWidth = boxW;
           this.selectionHeight = boxH;
-          console.log('New selectionWidth:', this.selectionWidth, 'New selectionHeight:', this.selectionHeight);
         }
 
         if (this.selectionWidth != null && this.selectionHeight != null) {
           boxW = this.selectionWidth;
           boxH = this.selectionHeight;
-          console.log('Using fixed dimensions:', boxW, boxH);
         }
 
         newBoxes.push({
@@ -143,15 +137,15 @@ export class ImageEditorState {
 
   async export(prefix: string, connector: string, slicingMode: 'custom' | 'grid', canvasPadding: number): Promise<Blob> {
     if (!this.sourceImage) {
-      throw new Error('No source image to export.');
+      throw new Error(this.t('errors.noSource'));
     }
 
     let boxesToExport: Box[] = [];
     if (slicingMode === 'custom') {
-      if (this.boxes.length === 0) throw new Error('No boxes to export in custom mode.');
+      if (this.boxes.length === 0) throw new Error(this.t('errors.noBoxes'));
       boxesToExport = this.boxes;
     } else if (slicingMode === 'grid') {
-      if (!this.gridArea) throw new Error('No grid area to export in grid mode.');
+      if (!this.gridArea) throw new Error(this.t('errors.noGrid'));
       const { x, y, w, h } = this.gridArea;
       const cellWidth = w / this.gridCols;
       const cellHeight = h / this.gridRows;
@@ -169,7 +163,7 @@ export class ImageEditorState {
     }
 
     if (boxesToExport.length === 0) {
-      throw new Error('No content to export.');
+      throw new Error(this.t('errors.noContent'));
     }
 
     const zip = new JSZip();

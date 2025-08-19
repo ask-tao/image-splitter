@@ -1,0 +1,56 @@
+{
+  "header": {
+    "title": "智能图片分割工具"
+  },
+  "upload": {
+    "main": "将图片文件拖到此处，或<em>点击导入</em>"
+  },
+  "sidebar": {
+    "edit": "编辑",
+    "canvasZoom": "画布缩放",
+    "canvasPadding": "画布边距",
+    "slicingMode": "分割模式",
+    "slicingModes": {
+      "custom": "框选",
+      "grid": "网格"
+    },
+    "recognitionMode": "识别模式",
+    "recognitionModes": {
+      "padding": "内边距",
+      "fixedSize": "固定宽高"
+    },
+    "boxPadding": "框内边距",
+    "width": "宽",
+    "height": "高",
+    "autoDetect": "创建选框",
+    "clearBoxes": "清除选框",
+    "rows": "行数",
+    "cols": "列数",
+    "generateGrid": "创建网格",
+    "clearGrid": "清除网格",
+    "export": "导出",
+    "fileNamePrefix": "请输入文件名前缀",
+    "prefix": "前缀",
+    "connector": "连接符",
+    "fileNamePreview": "预览:",
+    "exportImages": "导出图片",
+    "preview": "预览"
+  },
+  "contextMenu": {
+    "sendToBack": "层级置底",
+    "deleteBox": "删除选框"
+  },
+  "messages": {
+    "replaceConfirmTitle": "警告",
+    "replaceConfirmMsg": "这会替换掉当前图片和所有选框，是否继续？",
+    "clearAllConfirmTitle": "警告",
+    "clearAllConfirmMsg": "此操作将清除所有手动和自动生成的选框，是否继续？",
+    "exportErrorTitle": "导出失败"
+  },
+  "errors": {
+    "noSource": "没有可导出的图片源。",
+    "noBoxes": "自定义模式下没有可导出的选框。",
+    "noGrid": "网格模式下没有可导出的网格区域。",
+    "noContent": "没有可导出的内容。"
+  }
+}
