@@ -388,7 +388,7 @@ html:not(.dark) .app-footer {
   padding: 10px;
   flex: 1;
   min-height: 0;
-  min-width: min-content;
+  min-width:350px;
 }
 
 .content-container {
