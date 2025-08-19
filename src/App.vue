@@ -151,7 +151,7 @@
         </el-aside>
         <el-main class="main-content">
           <el-card shadow="always" class="canvas-card">
-            <canvas ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
+            <canvas v-if="sourceImage" ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
               @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
               @contextmenu.prevent="onRightClick"></canvas>
             <div v-if="isMenuVisible"
