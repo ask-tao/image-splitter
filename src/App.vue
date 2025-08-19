@@ -3,7 +3,7 @@
     <el-container class="app-container">
       <el-header class="app-header">
         <div class="header-title-group">
-          <img src="/logo.svg" alt="Logo" class="header-logo">
+          <img :src="logoSvgUrl" alt="Logo" class="header-logo">
           <h1>{{ $t('header.title') }}</h1>
         </div>
         <div class="header-actions">
@@ -189,6 +189,7 @@ import { UploadFilled, Download, Delete, Sunny, Moon } from '@element-plus/icons
 import enLocale from 'element-plus/dist/locale/en.mjs';
 import zhCnLocale from 'element-plus/dist/locale/zh-cn.mjs';
 import pkg from '../package.json';
+import logoSvgUrl from '/public/logo.svg'; // Import the SVG as a URL
 import { useImageEditor } from './composables/useImageEditor';
 import { useTheme } from './composables/useTheme';
 
