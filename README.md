@@ -14,7 +14,7 @@
 
 ## 项目介绍
 
-这是一个基于Web技术的图片分割工具，**`100%`由作者和`Gemini`共创生成。**
+这是一个基于Web技术的图片分割工具，**100%由作者结合`Gemini`开发**。
 
 旨在帮助`游戏开发者`或`UI设计师`快速、方便地从一张雪碧图 (`Sprite Sheet`) 或图片中，**提取出所有独立的精灵或icon资源。**
 
@@ -38,7 +38,6 @@
     ![Screenshot](doc/image/split_mode.png)
 
         - **行列设置**:
-  
         ![Screenshot](doc/image/grid_mode.png)
 
 - **编辑操作**: 支持选中、移动、删除选框，并支持通过8个锚点进行缩放。
@@ -113,3 +112,10 @@
 
 ## 后续计划
 - 打包发布桌面版软件
+
+---
+<center>☟公众号☟</center>
+<center>
+    <img src="https://cdn.jsdelivr.net/gh/ask-tao/wechat-public-img/images/qrcode_for_gh_62e629831aa5_430.jpg" style="width:100px;">
+</center>
+<center>您的关注、点赞、转发是我持续输出的动力～</center>
