@@ -1,6 +1,7 @@
 {
   "header": {
-    "title": "Image Splitter"
+    "title": "Image Splitter",
+    "help": "Help"
   },
   "upload": {
     "main": "Drag file here or <em>click to upload</em>"
@@ -52,5 +53,35 @@
     "noBoxes": "No boxes to export in custom mode.",
     "noGrid": "No grid area to export in grid mode.",
     "noContent": "No content to export."
+  },
+  "helpDialog": {
+    "title": "How to Use",
+    "content": {
+      "featuresList": [
+        {
+          "title": "<strong>Slicing Mode</strong>:",
+          "items": [
+            "<strong>Box Mode</strong>: Supports <strong>auto-detection</strong> and creating selection boxes by dragging the mouse. Create, move, and resize selection boxes anywhere. Hold down the <code>Shift</code> key to maintain the aspect ratio when resizing.",
+            "<strong>Grid Mode</strong>: Quickly perform uniform grid slicing by defining a scalable grid area and the number of rows and columns."
+          ]
+        },
+        {
+          "title": "<strong>Editing Operations</strong>: Supports selecting, moving, and deleting selection boxes, and resizing via 8 anchor points."
+        },
+        {
+          "title": "<strong>Canvas Control</strong>: Supports canvas scaling and global margin adjustment."
+        },
+        {
+          "title": "<strong>Hotkeys</strong>: Supports common function hotkeys",
+          "items": [
+            "<strong>Delete</strong>: Use the <code>Delete</code> or <code>Backspace</code> key to delete the selected box.",
+            "<strong>Fine-tuning</strong>: Use the <code>↑</code> <code>↓</code> <code>←</code> <code>→</code> arrow keys to fine-tune the position of the selection box (1px). Hold down the <code>Shift</code> key for quick fine-tuning (10px)."
+          ]
+        },
+        {
+          "title": "<strong>Export Function</strong>: One-click packaging of all images within the selection boxes into a <code>.zip</code> compressed file for download. Supports custom prefixes and connectors for exported filenames."
+        }
+      ]
+    }
   }
 }

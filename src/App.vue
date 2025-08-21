@@ -18,6 +18,11 @@
           <h1>{{ $t('header.title') }}</h1>
         </div>
         <div class="header-actions">
+          <el-tooltip :content="$t('header.help')" placement="bottom">
+            <span class="header-action-icon" @click="helpDialogVisible = true">
+              <el-icon :size="22"><QuestionFilled /></el-icon>
+            </span>
+          </el-tooltip>
           <el-dropdown @command="handleLanguageChange" trigger="click">
             <span class="el-dropdown-link header-action-icon">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -190,13 +195,25 @@
         </a>
       </el-footer>
     </el-container>
+    <el-dialog v-model="helpDialogVisible" :title="$t('helpDialog.title')" width="60%">
+      <div class="help-content">
+        <ul>
+          <li v-for="(feature, index) in helpFeatures" :key="index">
+            <span v-html="feature.title"></span>
+            <ul v-if="feature.items">
+              <li v-for="(item, itemIndex) in feature.items" :key="itemIndex" v-html="item"></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </el-dialog>
   </el-config-provider>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { UploadFilled, Download, Delete, Sunny, Moon } from '@element-plus/icons-vue';
+import { UploadFilled, Download, Delete, Sunny, Moon, QuestionFilled } from '@element-plus/icons-vue';
 import enLocale from 'element-plus/dist/locale/en.mjs';
 import zhCnLocale from 'element-plus/dist/locale/zh-cn.mjs';
 import pkg from '../package.json';
@@ -205,9 +222,13 @@ import { useTheme } from './composables/useTheme';
 
 const githubSvgPath = `<path d="M512 0C229.25 0 0 229.25 0 512a512.2 512.2 0 0 0 351.22 488.22c25.5 4.72 34.8-11.05 34.8-24.52v-86.42c-153.4 33.3-185.88-73.82-185.88-73.82-23.2-58.92-56.65-74.6-56.65-74.6-46.3-31.65 3.5-31 3.5-31 51.2 3.62 78.2 52.58 78.2 52.58 45.48 77.92 119.22 55.42 148.22 42.42a107.36 107.36 0 0 1 32.4-65.82c-113.1-12.8-231.9-56.55-231.9-251.5a196.3 196.3 0 0 1 52.6-137.32 184.18 184.18 0 0 1 5-135.5s42.7-13.68 140 52.2a485.32 485.32 0 0 1 255 0c97.3-65.88 140-52.2 140-52.2a184.18 184.18 0 0 1 5 135.5 196.3 196.3 0 0 1 52.6 137.32c0 195.4-119.1 238.5-232.4 251.1a123.32 123.32 0 0 1 34.6 94.92v140.32c0 13.6 9.2 29.4 35 24.5A512.2 512.2 0 0 0 1024 512C1024 229.25 794.75 0 512 0z"></path>`;
 
-const { t, locale } = useI18n();
+const { t, locale, tm } = useI18n();
 const version = pkg.version;
 const { isDarkMode } = useTheme();
+
+const helpDialogVisible = ref(false);
+
+const helpFeatures = computed(() => tm('helpDialog.content.featuresList'));
 
 const labelWidth = computed(() => (locale.value === 'zh-CN' ? '80px' : '110px'));
 
@@ -557,5 +578,24 @@ html:not(.dark) .app-footer {
 .slicing-mode-group .el-radio-button .el-radio-button__inner {
   width: 100%;
   text-align: center;
+}
+
+.help-content h3 {
+  margin-top: 0;
+}
+
+.help-content ul {
+  padding-left: 20px;
+}
+
+.help-content li {
+  margin-bottom: 10px;
+}
+
+.help-content code {
+  background-color: var(--el-color-info-light-9);
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: var(--el-color-danger);
 }
 </style>

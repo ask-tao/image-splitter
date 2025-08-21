@@ -1,6 +1,7 @@
 {
   "header": {
-    "title": "Image Splitter"
+    "title": "Image Splitter",
+    "help": "帮助"
   },
   "upload": {
     "main": "将图片文件拖到此处，或<em>点击导入</em>"
@@ -52,5 +53,35 @@
     "noBoxes": "自定义模式下没有可导出的选框。",
     "noGrid": "网格模式下没有可导出的网格区域。",
     "noContent": "没有可导出的内容。"
+  },
+  "helpDialog": {
+    "title": "操作指南",
+    "content": {
+      "featuresList": [
+        {
+          "title": "<strong>分割模式</strong>:",
+          "items": [
+            "<strong>框选模式</strong>: 支持<strong>自动识别</strong>和用鼠标拖拽创建选框。在任意位置创建、移动、缩放选框。支持按住 <code>Shift</code> 键保持纵横比缩放。",
+            "<strong>网格模式</strong>: 通过定义一个可缩放的网格区域及行列数，快速进行均匀的网格分割。"
+          ]
+        },
+        {
+          "title": "<strong>编辑操作</strong>: 支持选中、移动、删除选框，并支持通过8个锚点进行缩放。"
+        },
+        {
+          "title": "<strong>画布控制</strong>: 支持画布的缩放和全局外边距调整。"
+        },
+        {
+          "title": "<strong>快捷键</strong>: 支持常用功能快捷键",
+          "items": [
+            "<strong>删除</strong>: 使用 <code>Delete</code> 或 <code>Backspace</code> 键删除选中的选框。",
+            "<strong>微调</strong>: 使用 <code>↑</code> <code>↓</code> <code>←</code> <code>→</code> 方向键微调选框位置（1px）。按住 <code>Shift</code> 键，可快速微调（10px）。"
+          ]
+        },
+        {
+          "title": "<strong>导出功能</strong>: 一键将所有选框内的图片打包成一个 <code>.zip</code> 压缩文件供下载。支持自定义导出文件名的<code>前缀</code>和<code>连接符</code>。"
+        }
+      ]
+    }
   }
 }
