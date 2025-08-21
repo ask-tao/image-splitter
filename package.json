@@ -1,6 +1,6 @@
 {
-  "name": "imgsplit",
-  "version": "1.0.0",
+  "name": "image-splitter",
+  "version": "1.0.1",
   "description": "A tool to split image.",
   "scripts": {
     "dev": "vite",

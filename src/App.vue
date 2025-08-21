@@ -40,7 +40,7 @@
           </el-dropdown>
           <el-switch v-model="isDarkMode" inline-prompt :active-icon="Moon" :inactive-icon="Sunny"
             style="--el-switch-on-color: #2c2c2c; --el-switch-off-color: #577fd8;" />
-          <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer"
+          <a href="https://github.com/ask-tao/image-splitter" target="_blank" rel="noopener noreferrer"
             class="github-link header-action-icon">
             <svg viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" v-html="githubSvgPath"></svg>
           </a>
@@ -189,7 +189,7 @@
       </el-container>
       <el-footer class="app-footer">
         <span>MIT License © 2025 AskTao | <span>Image Splitter v{{ version }}</span></span>
-        <a href="https://github.com/ask-tao/imgsplit" target="_blank" rel="noopener noreferrer"
+        <a href="https://github.com/ask-tao/image-splitter" target="_blank" rel="noopener noreferrer"
           class="github-link footer-github-icon">
           <svg viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" v-html="githubSvgPath"></svg>
         </a>
