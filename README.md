@@ -119,7 +119,7 @@
     npm run build-single
     ```
     构建后的 `index.html` 单文件将生成在 `dist-single` 目录下。
-    你可以在 [Releases页面](https://github.com/ask-tao/image-splitter/releases) 下载最新的单文件html应用。
+    你可以自行构建单文件html使用。
 
 ### Desktop (桌面端)
 
