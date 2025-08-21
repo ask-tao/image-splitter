@@ -20,7 +20,7 @@
 
 本工具完全在浏览器端**本地运行**，保证了素材的安全性。
 
-下载地址：[历史版本](https://github.com/ask-tao/image-splitter/releases)
+[开源地址：https://github.com/ask-tao/image-splitter](https://github.com/ask-tao/image-splitter/releases)
 
 ## 功能特性
 
@@ -81,7 +81,17 @@
   - 程序会遍历所有选框，将每一个裁剪出的图片数据 (Blob) 添加到内存中的一个 `JSZip` 实例里。
   - 循环结束后，`JSZip` 会将内存中的所有图片生成为一个 `.zip` 压缩包的 Blob 数据，最后通过 `URL.createObjectURL` 创建一个下载链接，实现单次、可靠的批量下载。
 
-## 项目运行
+## 桌面端应用 (Desktop Application)
+
+本项目同样支持打包成原生的桌面端应用（macOS, Windows, Linux），具备以下特性：
+
+- **原生体验**: 提供更沉浸的使用体验。
+- **自动更新**: 应用内集成了自动更新功能，当发布新版本时，用户会自动收到通知并更新。
+- **离线使用**: 无需浏览器，直接在桌面运行。
+
+你可以在[Releases页面](https://github.com/ask-tao/image-splitter/releases) 下载最新的桌面版应用。
+
+## 开发与构建 (Development & Building)
 
 本项目基于 [Node.js](https://nodejs.org/) 和 [npm](https://www.npmjs.com/)。请确保您的环境中已安装它们。
 
@@ -90,28 +100,40 @@
     npm install
     ```
 
-2.  **运行开发服务器**:
+### Web (网页版)
+
+- **运行开发服务器**:
     ```bash
     npm run dev
     ```
     项目将在本地开发服务器上运行，通常在 `http://localhost:5173`。
 
-3.  **构建生产版本**:
+- **构建生产版本**:
     ```bash
     npm run build
     ```
-    构建后的文件将生成在 `dist` 目录下，可用于部署。
+    构建后的纯净 Web 应用文件将生成在 `dist` 目录下，可用于部署。
 
-4. **构建单文件**:
+- **构建单文件**:
     ```bash
     npm run build-single
     ```
-    构建后的文件将生成在 `dist-single` 目录下，在浏览器打开`index.html`即可使用。
+    构建后的 `index.html` 单文件将生成在 `dist-single` 目录下。
+    你可以在 [Releases页面](https://github.com/ask-tao/image-splitter/releases) 下载最新的单文件html应用。
 
-    > 可在Github[Releases](https://github.com/ask-tao/image-splitter/releases)中下载可运行的html单文件
+### Desktop (桌面端)
 
-## 后续计划
-- 打包发布桌面版软件
+- **运行开发环境**:
+    ```bash
+    npm run electron:dev
+    ```
+    这将启动一个带调试工具的桌面端应用窗口，并支持热重载。
+
+- **打包桌面应用**:
+    ```bash
+    npm run electron:pack
+    ```
+    该命令会先构建 Web 内容和编译 Electron 主进程代码，然后将它们打包成适用于你当前操作系统的原生应用（例如在 macOS 上会生成 `.dmg` 文件）。打包产物位于 `release` 目录下。
 
 ---
 <center>☟公众号☟</center>

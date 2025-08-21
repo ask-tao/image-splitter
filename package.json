@@ -10,7 +10,8 @@
     "build-single": "vite build --mode single-file",
     "preview": "vite preview",
     "electron:dev": "VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
-    "electron:pack": "npm run build && tsc --project tsconfig.electron.json && electron-builder"
+    "pack": "npm run build && tsc --project tsconfig.electron.json && electron-builder",
+    "pack:linux": "npm run build && tsc --project tsconfig.electron.json && electron-builder --linux"
   },
   "build": {
     "appId": "com.zhang.image-splitter",
@@ -34,7 +35,8 @@
     },
     "linux": {
       "target": "AppImage",
-      "icon": "icon/logo.png"
+      "icon": "icon/logo.png",
+      "category": "Graphics"
     }
   },
   "dependencies": {
@@ -46,6 +48,7 @@
     "vue-i18n": "^11.1.11"
   },
   "devDependencies": {
+    "@types/semver": "^7.7.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
     "electron": "^37.3.1",
