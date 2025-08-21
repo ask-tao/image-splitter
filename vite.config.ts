@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
   const isSingleFileBuild = mode === 'single-file';
 
   return {
+    base: './',
     plugins: [
       vue(),
       AutoImport({
@@ -22,6 +23,7 @@ export default defineConfig(({ mode }) => {
     ].filter(Boolean),
     build: {
       outDir: isSingleFileBuild ? 'dist-single' : 'dist', // Set output directory conditionally
+      
     },
   }
 })

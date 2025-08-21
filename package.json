@@ -2,13 +2,44 @@
   "name": "image-splitter",
   "version": "1.0.1",
   "description": "A tool to split image.",
+  "main": "dist-electron/main.js",
+  "repository": "ask-tao/image-splitter",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build-single": "vite build --mode single-file",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
+    "electron:pack": "npm run build && tsc --project tsconfig.electron.json && electron-builder"
+  },
+  "build": {
+    "appId": "com.zhang.image-splitter",
+    "productName": "Image Splitter",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "dist-electron/**"
+    ],
+    "publish": {
+      "provider": "github"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icon/logo.icns"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icon/logo.png"
+    }
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "electron-updater": "^6.6.2",
     "element-plus": "^2.7.7",
     "jszip": "^3.10.1",
     "vue": "^3.5.18",
@@ -17,11 +48,13 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12",
     "typescript": "~5.8.3",
     "unplugin-auto-import": "^0.18.2",
     "unplugin-vue-components": "^0.27.3",
     "vite": "^7.1.2",
-    "vue-tsc": "^3.0.5",
-    "vite-plugin-singlefile": "^0.13.0"
+    "vite-plugin-singlefile": "^0.13.0",
+    "vue-tsc": "^3.0.5"
   }
 }

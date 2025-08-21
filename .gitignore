@@ -4,6 +4,7 @@
 # Build output
 /dist
 /dist-single
+/dist-electron
 
 # Logs
 npm-debug.log*
@@ -14,3 +15,8 @@ yarn-error.log*
 .vscode
 .idea
 .DS_Store
+
+# Electron build output
+/release
+*.tsbuildinfo
+icon-temp

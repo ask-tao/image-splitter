@@ -1,6 +1,6 @@
 <div align="center">
 
-[![doocs-md](doc/image/logo.svg)](https://github.com/ask-tao/image-splitter)
+[![doocs-md](icon/logo.svg)](https://github.com/ask-tao/image-splitter)
 
 </div>
 
