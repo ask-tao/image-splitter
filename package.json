@@ -32,7 +32,8 @@
       "icon": "icon/logo.icns"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "icon/logo.ico"
     },
     "linux": {
       "target": "AppImage",
