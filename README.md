@@ -131,9 +131,9 @@
 
 - **打包桌面应用**:
     ```bash
-    npm run electron:pack
+    npm run pack
     ```
-    该命令会先构建 Web 内容和编译 Electron 主进程代码，然后将它们打包成适用于你当前操作系统的原生应用（例如在 macOS 上会生成 `.dmg` 文件）。打包产物位于 `release` 目录下。
+    该命令会先构建 Web 内容和编译 Electron 主进程代码，然后将它们打包成适用于**你当前操作系统**的原生应用（例如在macOS上打包会生成`.dmg` 文件）。打包产物位于 `release` 目录下。
 
 ---
 <center>☟公众号☟</center>
