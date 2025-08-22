@@ -89,7 +89,10 @@
 - **自动更新**: 应用内集成了自动更新功能，当发布新版本时，用户会自动收到通知并更新。
 - **离线使用**: 无需浏览器，直接在桌面运行。
 
-你可以在[Releases页面](https://github.com/ask-tao/image-splitter/releases) 下载最新的桌面版应用。
+你可以在[Releases页面](https://github.com/ask-tao/image-splitter/releases)下载最新的桌面版应用：
+- **Mac**:`Image.Splitter-x.x.x-arm64.dmg`
+- **Windows**:`Image.Splitter.Setup.x.x.x.exe`
+- **Linux**:`Image.Splitter-x.x.x-arm64.AppImage`
 
 ## 开发与构建 (Development & Building)
 
@@ -132,6 +135,9 @@
 - **打包桌面应用**:
     ```bash
     npm run pack
+
+    // Mac打Linux包
+    npm run pack:linux
     ```
     该命令会先构建 Web 内容和编译 Electron 主进程代码，然后将它们打包成适用于**你当前操作系统**的原生应用（例如在macOS上打包会生成`.dmg` 文件）。打包产物位于 `release` 目录下。
 
