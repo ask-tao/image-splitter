@@ -483,6 +483,10 @@ html:not(.dark) .app-footer {
   border-top: 1px solid #303030;
 }
 
+.dark .el-divider__text {
+  background-color: var(--el-bg-color-overlay);
+}
+
 .dark .checkerboard-bg {
   background-image:
     linear-gradient(45deg, #3e3e3e 25%, transparent 25%),
