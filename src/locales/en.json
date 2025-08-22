@@ -83,5 +83,15 @@
         }
       ]
     }
+  },
+  "updater": {
+    "checkUpdate": "Check for Updates",
+    "updateNotAvailable": "You are on the latest version.",
+    "downloadedTitle": "Update Ready",
+    "downloadedMsg": "A new version has been downloaded. Restart the application to apply the update?",
+    "updateNow": "Restart Now",
+    "later": "Later",
+    "errorTitle": "Update Failed",
+    "errorMsg": "An error occurred while checking for updates. Please try again later."
   }
 }

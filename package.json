@@ -2,6 +2,7 @@
   "name": "image-splitter",
   "version": "1.0.1",
   "description": "A tool to split image.",
+  "productName": "Image Splitter",
   "main": "dist-electron/main.js",
   "repository": "ask-tao/image-splitter",
   "scripts": {

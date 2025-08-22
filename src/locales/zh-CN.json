@@ -55,7 +55,7 @@
     "noContent": "没有可导出的内容。"
   },
   "helpDialog": {
-    "title": "操作指南",
+    "title": "使用指南",
     "content": {
       "featuresList": [
         {
@@ -83,5 +83,15 @@
         }
       ]
     }
+  },
+  "updater": {
+    "checkUpdate": "检查更新",
+    "updateNotAvailable": "当前已是最新版本。",
+    "downloadedTitle": "更新提示",
+    "downloadedMsg": "新版本已下载完成，是否立即退出并安装？",
+    "updateNow": "立即更新",
+    "later": "稍后",
+    "errorTitle": "更新失败",
+    "errorMsg": "检查更新时遇到错误，请稍后重试。"
   }
 }
