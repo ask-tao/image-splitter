@@ -65,12 +65,7 @@ const createMenu = (lang: 'en' | 'zh-CN' = 'zh-CN') => {
         {
           label: t.about,
           click: () => {
-            dialog.showMessageBox(mainWindow!, {
-              type: 'info',
-              title: t.about + ' ' + app.getName(),
-              message: app.getName(),
-              detail: `Version: ${app.getVersion()}\nElectron: ${process.versions.electron}\nChrome: ${process.versions.chrome}\nNode.js: ${process.versions.node}`
-            });
+            mainWindow?.webContents.send('show-about-dialog');
           }
         }
       ]
@@ -103,10 +98,21 @@ const createMenu = (lang: 'en' | 'zh-CN' = 'zh-CN') => {
 
     const helpMenu = menuTemplate.find(m => m.role === 'help');
     if (helpMenu && helpMenu.submenu) {
+      // Remove the default about item if it exists (it will be added back with IPC)
       const aboutItemIndex = (helpMenu.submenu as Electron.MenuItemConstructorOptions[]).findIndex(i => i.label === t.about);
       if (aboutItemIndex !== -1) {
         (helpMenu.submenu as Electron.MenuItemConstructorOptions[]).splice(aboutItemIndex, 1);
       }
+      // Add the custom about item with IPC call
+      (helpMenu.submenu as Electron.MenuItemConstructorOptions[]).push(
+        { type: 'separator' },
+        {
+          label: t.about,
+          click: () => {
+            mainWindow?.webContents.send('show-about-dialog');
+          }
+        }
+      );
     }
   } else {
     const helpMenu = menuTemplate.find(m => m.role === 'help');

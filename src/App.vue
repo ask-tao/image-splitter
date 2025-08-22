@@ -23,6 +23,11 @@
               <el-icon :size="22"><QuestionFilled /></el-icon>
             </span>
           </el-tooltip>
+          <el-tooltip :content="$t('header.about')" placement="bottom">
+            <span class="header-action-icon" @click="aboutDialogVisible = true">
+              <el-icon :size="22"><InfoFilled /></el-icon>
+            </span>
+          </el-tooltip>
           <el-dropdown @command="handleLanguageChange" trigger="click">
             <span class="el-dropdown-link header-action-icon">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -207,6 +212,21 @@
         </ul>
       </div>
     </el-dialog>
+    <el-dialog v-model="aboutDialogVisible" :title="$t('aboutDialog.title')" width="400px">
+      <div class="about-content">
+        <p>{{ $t('aboutDialog.description') }}</p>
+        <p>{{ $t('aboutDialog.purpose') }}</p>
+        <p>{{ $t('aboutDialog.developer') }}: AskTao</p>
+        <p>{{ $t('aboutDialog.version') }}: {{ version }}</p>
+        <p>{{ $t('aboutDialog.github') }}: <a href="https://github.com/ask-tao/image-splitter" target="_blank">https://github.com/ask-tao/image-splitter</a></p>
+        <el-divider />
+        <div class="donation-container">
+          <p>{{ $t('aboutDialog.donation') }}</p>
+          <img src="https://cdn.jsdelivr.net/gh/ask-tao/wechat-public-img/images/微信图片_2025-08-22_140048_725.jpg" alt="WeChat Pay" class="donation-image-placeholder" />
+          <p>{{ $t('aboutDialog.motto') }}</p>
+        </div>
+      </div>
+    </el-dialog>
   </el-config-provider>
 </template>
 
@@ -214,7 +234,7 @@
 import { computed, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElNotification, ElMessageBox } from 'element-plus';
-import { UploadFilled, Download, Delete, Sunny, Moon, QuestionFilled } from '@element-plus/icons-vue';
+import { UploadFilled, Download, Delete, Sunny, Moon, QuestionFilled, InfoFilled } from '@element-plus/icons-vue';
 import enLocale from 'element-plus/dist/locale/en.mjs';
 import zhCnLocale from 'element-plus/dist/locale/zh-cn.mjs';
 import pkg from '../package.json';
@@ -259,6 +279,10 @@ onMounted(() => {
     helpDialogVisible.value = true;
   });
 
+  window.ipcApi?.onShowAboutDialog(() => {
+    aboutDialogVisible.value = true;
+  });
+
   // Listen for language change requests from the main process menu
   window.ipcApi?.onSetLanguage((lang) => {
     handleLanguageChange(lang);
@@ -275,6 +299,7 @@ const version = pkg.version;
 const { isDarkMode } = useTheme();
 
 const helpDialogVisible = ref(false);
+const aboutDialogVisible = ref(false);
 
 const helpFeatures = computed(() => tm('helpDialog.content.featuresList'));
 
@@ -647,5 +672,29 @@ html:not(.dark) .app-footer {
   padding: 2px 4px;
   border-radius: 4px;
   color: var(--el-color-danger);
+}
+
+.about-content {
+  text-align: center;
+}
+
+.about-content p {
+  margin-bottom: 10px;
+}
+
+.donation-container {
+  margin-top: 20px;
+}
+
+.donation-image-placeholder {
+  width: 150px;
+  height: 150px;
+  display: block;
+  margin: 10px auto;
+  line-height: 150px;
+  color: var(--el-text-color-secondary);
+  text-align: center;
+  content: "赞赏码占位图";
+  font-size: 14px;
 }
 </style>

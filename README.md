@@ -16,11 +16,11 @@
 
 这是一个基于Web技术的图片分割工具，**100%由作者结合`Gemini`开发**。
 
-旨在帮助`游戏开发者`或`UI设计师`快速、方便地从一张雪碧图 (`Sprite Sheet`) 或图片中，**提取出所有独立的精灵或icon资源。**
+旨在帮助`游戏开发者`或`UI设计师`快速、方便地从一张雪碧图 (`Sprite Sheet`) 中，**提取出所有独立的精灵或icon资源**，或按网格分割图片得到其切片。
 
 本工具完全在浏览器端**本地运行**，保证了素材的安全性。
 
-[开源地址：https://github.com/ask-tao/image-splitter](https://github.com/ask-tao/image-splitter/releases)
+[开源地址：https://github.com/ask-tao/image-splitter](https://github.com/ask-tao/image-splitter)
 
 ## 功能特性
 
@@ -138,6 +138,10 @@
 ---
 <center>☟公众号☟</center>
 <center>
-    <img src="https://cdn.jsdelivr.net/gh/ask-tao/wechat-public-img/images/qrcode_for_gh_62e629831aa5_430.jpg" style="width:100px;">
+    <img src="https://cdn.jsdelivr.net/gh/ask-tao/wechat-public-img/images/qrcode_for_gh_62e629831aa5_430.jpg" style="width:130px;">
 </center>
 <center>您的关注、点赞、转发是我持续输出的动力～</center>
+<center>☟支持我☟</center>
+<center>
+    <img src="https://cdn.jsdelivr.net/gh/ask-tao/wechat-public-img/images/微信图片_2025-08-22_140048_725.jpg" style="width:150px;">
+</center>

@@ -19,6 +19,9 @@ contextBridge.exposeInMainWorld('ipcApi', {
   onShowHelpDialog: (callback: () => void) => {
     ipcRenderer.on('show-help-dialog', callback);
   },
+  onShowAboutDialog: (callback: () => void) => {
+    ipcRenderer.on('show-about-dialog', callback);
+  },
   onSetLanguage: (callback: (lang: string) => void) => {
     ipcRenderer.on('set-language', (event, ...args) => callback(args[0]));
   }

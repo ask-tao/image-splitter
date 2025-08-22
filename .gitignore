@@ -21,3 +21,4 @@ yarn-error.log*
 *.tsbuildinfo
 icon-temp
 /icon/.icon-temp
+TODO.md

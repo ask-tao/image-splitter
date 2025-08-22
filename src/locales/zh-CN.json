@@ -1,7 +1,8 @@
 {
   "header": {
     "title": "Image Splitter",
-    "help": "帮助"
+    "help": "帮助",
+    "about": "关于"
   },
   "upload": {
     "main": "将图片文件拖到此处，或<em>点击导入</em>"
@@ -93,5 +94,15 @@
     "later": "稍后",
     "errorTitle": "更新失败",
     "errorMsg": "检查更新时遇到错误，请稍后重试。"
+  },
+  "aboutDialog": {
+    "title": "关于",
+    "description": "一个简单高效的图片分割工具。",
+    "purpose": "快速、方便地从一张雪碧图 (Sprite Sheet) 中，提取出所有独立的精灵或均匀分割一张图片。",
+    "developer": "开发者",
+    "version": "版本",
+    "github": "GitHub",
+    "donation": "如果您觉得此工具对您有帮助，可以通过微信扫描下方二维码支持开发者：",
+    "motto": "\"您的赞赏是我前进的动力！\""
   }
 }

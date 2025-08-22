@@ -11,6 +11,7 @@ declare global {
       onUpdateDownloaded: (callback: (info: any) => void) => void;
       onUpdateError: (callback: (error: Error) => void) => void;
       onShowHelpDialog: (callback: () => void) => void;
+      onShowAboutDialog: (callback: () => void) => void;
       onSetLanguage: (callback: (lang: string) => void) => void;
     };
   }

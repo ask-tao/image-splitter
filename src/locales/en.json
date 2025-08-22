@@ -1,7 +1,8 @@
 {
   "header": {
     "title": "Image Splitter",
-    "help": "Help"
+    "help": "Help",
+    "about": "About"
   },
   "upload": {
     "main": "Drag file here or <em>click to upload</em>"
@@ -93,5 +94,15 @@
     "later": "Later",
     "errorTitle": "Update Failed",
     "errorMsg": "An error occurred while checking for updates. Please try again later."
+  },
+  "aboutDialog": {
+    "title": "About",
+    "description": "A simple and efficient image splitting tool.",
+    "purpose": "Quickly and conveniently extract all independent sprites from a sprite sheet, or uniformly split an image.",
+    "developer": "Developer",
+    "version": "Version",
+    "github": "GitHub",
+    "donation": "If you find this tool helpful, you can support the developer by scanning the WeChat QR code below:",
+    "motto": "\"Your appreciation is my motivation!\""
   }
 }
