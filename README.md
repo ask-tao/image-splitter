@@ -16,11 +16,12 @@
 
 这是一个基于Web技术的图片分割工具，**100%由作者结合`Gemini`开发**。
 
-旨在帮助`游戏开发者`或`UI设计师`快速、方便地从一张雪碧图 (`Sprite Sheet`) 中，**提取出所有独立的精灵或icon资源**，或按网格分割图片得到其切片。
+旨在帮助`游戏开发者`或`UI设计师`快速、方便地从一张雪碧图 (`Sprite Sheet`) 中，**提取出所有独立的精灵icon资源**，或按网格分割图片得到其切片。
 
-本工具完全在浏览器端**本地运行**，保证了素材的安全性。
+本工具完全在**本地运行**，保证了素材的安全性。
 
-[开源地址：https://github.com/ask-tao/image-splitter](https://github.com/ask-tao/image-splitter)
+[👏开源地址：https://github.com/ask-tao/image-splitter](https://github.com/ask-tao/image-splitter)
+如果对你有帮助，欢迎给个Star🌟。
 
 ## 功能特性
 
@@ -83,11 +84,11 @@
 
 ## 桌面端应用 (Desktop Application)
 
-本项目同样支持打包成原生的桌面端应用（macOS, Windows, Linux），具备以下特性：
+项目支持打包成原生的桌面端应用（macOS, Windows, Linux）：
 
-- **原生体验**: 提供更沉浸的使用体验。
-- **自动更新**: 应用内集成了自动更新功能，当发布新版本时，用户会自动收到通知并更新。
-- **离线使用**: 无需浏览器，直接在桌面运行。
+- **原生体验**
+- **自动更新**
+- **离线使用**
 
 你可以在[Releases页面](https://github.com/ask-tao/image-splitter/releases)下载最新的桌面版应用：
 - **Mac**:`Image.Splitter-x.x.x-arm64.dmg`
