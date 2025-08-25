@@ -419,6 +419,11 @@ html:not(.dark) .app-header .github-link:hover {
   display: flex;
   align-items: center;
   overflow: hidden;
+  transition: filter 0.3s ease-in-out;
+}
+
+.header-title-link:hover .header-title-group {
+  filter: drop-shadow(0 0 10px #41D1FF) drop-shadow(0 0 6px #BD34FE);
 }
 
 .header-title-link {
