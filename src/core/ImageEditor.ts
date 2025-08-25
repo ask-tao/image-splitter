@@ -8,7 +8,7 @@ export interface Box {
   h: number;
 }
 
-export class ImageEditorState {
+export class ImageEditor {
   sourceImage: HTMLImageElement | null = null;
   boxes: Box[] = [];
   gridArea: Box | null = null;

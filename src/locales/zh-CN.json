@@ -47,7 +47,10 @@
     "replaceConfirmMsg": "这会替换掉当前图片和所有选框，是否继续？",
     "clearAllConfirmTitle": "警告",
     "clearAllConfirmMsg": "此操作将清除所有手动和自动生成的选框，是否继续？",
-    "exportErrorTitle": "导出失败"
+    "switchModeConfirmMsg": "切换分割模式将重置所有当前的选框或网格，确定要继续吗？",
+    "exportErrorTitle": "导出失败",
+    "confirm": "确定",
+    "cancel": "取消"
   },
   "errors": {
     "noSource": "没有可导出的图片源。",

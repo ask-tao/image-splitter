@@ -47,7 +47,10 @@
     "replaceConfirmMsg": "This will replace the current image and all selection boxes. Continue?",
     "clearAllConfirmTitle": "Warning",
     "clearAllConfirmMsg": "This will clear all manual and auto-detected boxes. Continue?",
-    "exportErrorTitle": "Export Failed"
+    "switchModeConfirmMsg": "Switching the slicing mode will reset all current selections or grid. Are you sure you want to continue?",
+    "exportErrorTitle": "Export Failed",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   },
   "errors": {
     "noSource": "No source image to export.",

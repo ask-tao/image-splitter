@@ -92,13 +92,13 @@
                   <el-row :gutter="10">
                     <el-col :span="12">
                       <el-form-item :label="$t('sidebar.width')">
-                        <el-input-number v-model="editorState.selectionWidth" :min="1" :max="2000" size="small"
+                        <el-input-number v-model="imageEditor.selectionWidth" :min="1" :max="2000" size="small"
                           style="width: 100%;" />
                       </el-form-item>
                     </el-col>
                     <el-col :span="12">
                       <el-form-item :label="$t('sidebar.height')">
-                        <el-input-number v-model="editorState.selectionHeight" :min="1" :max="2000" size="small"
+                        <el-input-number v-model="imageEditor.selectionHeight" :min="1" :max="2000" size="small"
                           style="width: 100%;" />
                       </el-form-item>
                     </el-col>
@@ -170,7 +170,7 @@
           <el-card shadow="always" class="canvas-card">
             <canvas v-if="sourceImage" ref="canvasRef" class="editor-canvas checkerboard-bg" :style="{ cursor: cursorStyle }"
               @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseLeave"
-              @contextmenu.prevent="onRightClick"></canvas>
+              @contextmenu.prevent="onRightClick" @drop.prevent="onDrop" @dragover.prevent></canvas>
             <div v-if="isMenuVisible"
               :style="{ top: menuTop + 'px', left: menuLeft + 'px', position: 'fixed', zIndex: 9999 }">
               <el-dropdown ref="dropdownRef" @command="handleCommand" @visible-change="handleVisibleChange">
@@ -323,7 +323,6 @@ const {
   previewCanvasRef,
   sourceImage,
   cursorStyle,
-  fileInputRef,
   slicingMode,
   gridRows,
   gridCols,
@@ -338,8 +337,6 @@ const {
   menuLeft,
   dropdownRef,
   handleFileChange,
-  onCanvasPlaceholderClick,
-  onFileSelected,
   onDrop,
   onMouseDown,
   onMouseMove,
@@ -353,9 +350,9 @@ const {
   handleAutoDetect,
   handleClearAll,
   handleExport,
-  editorState,
+  imageEditor,
   autoDetectMode,
-} = useImageEditor(t);
+} = useImageEditor();
 </script>
 
 <style>

@@ -1,736 +1,131 @@
-import { ref, onMounted, onUnmounted, computed, watch, nextTick, reactive, watchEffect, toRefs } from 'vue';
-import type { UploadFile, DropdownInstance } from 'element-plus';
+import { ref, watch, computed, toRefs } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { ImageEditorState, type Box } from '../core/ImageEditorState';
+import { useI18n } from 'vue-i18n';
+import { useCanvasState } from './useCanvasState';
+import { useCanvasDrawing } from './useCanvasDrawing';
+import { useCanvasInteraction } from './useCanvasInteraction';
+import { useContextMenu } from './useContextMenu';
+import { useKeyboardShortcuts } from './useKeyboardShortcuts';
+import { useFileHandling } from './useFileHandling';
+import { useAutoDetect } from './useAutoDetect';
 
-export function useImageEditor(t: (key: string) => string) {
-  // --- Core State ---
-  const editorState = reactive(new ImageEditorState(t));
+/**
+ * @description The main composable for the image editor.
+ * It integrates all other composables and provides a unified interface to the UI.
+ */
+export function useImageEditor() {
+  const { t } = useI18n();
 
-  // --- UI State ---
+  // --- Template Refs ---
   const canvasRef = ref<HTMLCanvasElement | null>(null);
   const previewCanvasRef = ref<HTMLCanvasElement | null>(null);
-  const fileInputRef = ref<HTMLInputElement | null>(null);
-  const ctxRef = ref<CanvasRenderingContext2D | null>(null);
 
-  const selectedBoxId = ref<number | null>(null);
+  // 1. --- State Management ---
+  const state = useCanvasState();
+  const { imageEditor, slicingMode, canvasZoom, canvasPadding, selectedBoxId } = state;
 
-  // Interaction State
-  const isDrawing = ref(false);
-  const isMoving = ref(false);
-  const isResizing = ref(false);
-  const startX = ref(0);
-  const startY = ref(0);
-  const offsetX = ref(0);
-  const offsetY = ref(0);
-  const activeAnchor = ref<string | null>(null);
-  const originalAspectRatio = ref(1);
-  const cursorStyle = ref('default');
+  // 2. --- Drawing ---
+  const { setupCanvas, getAnchors } = useCanvasDrawing(state, canvasRef, previewCanvasRef);
 
-  // UI Control State
-  const slicingMode = ref<'custom' | 'grid'>('custom');
-  const canvasZoom = ref(100);
-  const canvasPadding = ref(20);
-  const autoDetectPadding = ref(0);
-  const exportPrefix = ref('sprite');
-  const exportConnector = ref('_');
-  const autoDetectMode = ref<'padding' | 'fixedSize'>('padding');
+  // 3. --- Canvas Interaction ---
+  const { onMouseDown, onMouseMove, onMouseUp, onMouseLeave, getBoxAt } = useCanvasInteraction(state, canvasRef, getAnchors);
 
-  // Context Menu State
-  const dropdownRef = ref<DropdownInstance | null>(null);
-  const isMenuVisible = ref(false);
-  const menuTop = ref(0);
-  const menuLeft = ref(0);
-  const rightClickedBoxId = ref<number | null>(null);
+  // 4. --- Context Menu ---
+  const { dropdownRef, isMenuVisible, menuTop, menuLeft, onRightClick, handleCommand, handleVisibleChange } = useContextMenu(state, canvasRef, getBoxAt);
 
-  // --- Computed properties ---
+  // 5. --- Keyboard Shortcuts ---
+  useKeyboardShortcuts(state);
+
+  // 6. --- File Handling ---
+  const { handleFileChange, handleExport, onDrop } = useFileHandling(state, setupCanvas);
+
+  // 7. --- Auto-detection ---
+  const { handleAutoDetect } = useAutoDetect(state, canvasRef);
+
+  // --- Computed Properties ---
   const fileNamePreview = computed(() => {
-    return `${exportPrefix.value}${exportConnector.value}1.png`;
+    return `${state.exportPrefix.value}${state.exportConnector.value}1.png`;
   });
 
-  // --- Drawing Logic ---
-  const ANCHOR_SIZE = 8;
-  const ANCHOR_COLOR = '#ffffff';
-  const ANCHOR_STROKE_COLOR = '#007bff';
+  // --- Watchers that orchestrate multiple composables ---
+  watch(canvasPadding, (newPadding) => {
+    if (imageEditor.sourceImage) setupCanvas(imageEditor.sourceImage);
+  });
 
-  const getAnchors = (box: Box) => {
-    return {
-      topLeft: { x: box.x, y: box.y },
-      topMiddle: { x: box.x + box.w / 2, y: box.y },
-      topRight: { x: box.x + box.w, y: box.y },
-      middleLeft: { x: box.x, y: box.y + box.h / 2 },
-      middleRight: { x: box.x + box.w, y: box.y + box.h / 2 },
-      bottomLeft: { x: box.x, y: box.y + box.h },
-      bottomMiddle: { x: box.x + box.w / 2, y: box.y + box.h },
-      bottomRight: { x: box.x + box.w, y: box.y + box.h },
-    };
-  };
-
-  const draw = () => {
-    const canvas = canvasRef.value;
-    const ctx = ctxRef.value;
-    if (!canvas || !ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (editorState.sourceImage) {
-      ctx.drawImage(editorState.sourceImage, canvasPadding.value, canvasPadding.value);
-
-      if (slicingMode.value === 'custom') {
-        editorState.boxes.forEach(box => {
-          const isSelected = box.id === selectedBoxId.value;
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = isSelected ? '#007bff' : '#FF0000';
-          ctx.strokeRect(box.x, box.y, box.w, box.h);
-
-          if (isSelected) {
-            ctx.fillStyle = ANCHOR_COLOR;
-            ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-            ctx.lineWidth = 2;
-            const anchors = getAnchors(box);
-            for (const key in anchors) {
-              const anchor = anchors[key as keyof typeof anchors];
-              ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-              ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-            }
-          }
-        });
-      } else if (slicingMode.value === 'grid' && editorState.gridArea) {
-        const box = editorState.gridArea;
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#007bff';
-        ctx.strokeRect(box.x, box.y, box.w, box.h);
-
-        ctx.strokeStyle = '#007bff';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-
-        const cellWidth = box.w / editorState.gridCols;
-        for (let i = 1; i < editorState.gridCols; i++) {
-          ctx.beginPath();
-          ctx.moveTo(box.x + i * cellWidth, box.y);
-          ctx.lineTo(box.x + i * cellWidth, box.y + box.h);
-          ctx.stroke();
-        }
-
-        const cellHeight = box.h / editorState.gridRows;
-        for (let i = 1; i < editorState.gridRows; i++) {
-          ctx.beginPath();
-          ctx.moveTo(box.x, box.y + i * cellHeight);
-          ctx.lineTo(box.x + box.w, box.y + i * cellHeight);
-          ctx.stroke();
-        }
-        ctx.setLineDash([]);
-
-        ctx.fillStyle = ANCHOR_COLOR;
-        ctx.strokeStyle = ANCHOR_STROKE_COLOR;
-        ctx.lineWidth = 2;
-        const anchors = getAnchors(box);
-        for (const key in anchors) {
-          const anchor = anchors[key as keyof typeof anchors];
-          ctx.fillRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-          ctx.strokeRect(anchor.x - ANCHOR_SIZE / 2, anchor.y - ANCHOR_SIZE / 2, ANCHOR_SIZE, ANCHOR_SIZE);
-        }
-      }
-    }
-  };
-
-  const updatePreview = () => {
-    const previewCanvas = previewCanvasRef.value;
-    if (!previewCanvas || !editorState.sourceImage) return;
-
-    const container = previewCanvas.parentElement;
-    if (!container) return;
-
-    previewCanvas.width = container.clientWidth;
-    previewCanvas.height = container.clientHeight;
-
-    const previewCtx = previewCanvas.getContext('2d');
-    if (!previewCtx) return;
-
-    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-    if (slicingMode.value === 'grid') return;
-
-    const selectedBox = editorState.boxes.find(b => b.id === selectedBoxId.value);
-
-    if (selectedBox && selectedBox.w > 0 && selectedBox.h > 0) {
-      const aspectRatio = selectedBox.w / selectedBox.h;
-      let drawW = previewCanvas.width;
-      let drawH = drawW / aspectRatio;
-
-      if (drawH > previewCanvas.height) {
-        drawH = previewCanvas.height;
-        drawW = drawH * aspectRatio;
-      }
-
-      const drawX = (previewCanvas.width - drawW) / 2;
-      const drawY = (previewCanvas.height - drawH) / 2;
-
-      previewCtx.drawImage(
-        editorState.sourceImage,
-        selectedBox.x - canvasPadding.value, selectedBox.y - canvasPadding.value, selectedBox.w, selectedBox.h,
-        drawX, drawY, drawW, drawH
-      );
-    }
-  };
-
-  // --- Watchers for automatic redraw ---
-  watchEffect(() => {
-    if (canvasRef.value) {
-      draw();
+  watch(canvasZoom, (newZoom) => {
+    if (canvasRef.value && imageEditor.sourceImage) {
+      canvasRef.value.style.width = `${(imageEditor.sourceImage.width + canvasPadding.value * 2) * (newZoom / 100)}px`;
+      canvasRef.value.style.height = `${(imageEditor.sourceImage.height + canvasPadding.value * 2) * (newZoom / 100)}px`;
     }
   });
 
-  watchEffect(() => {
-    if (previewCanvasRef.value) {
-      updatePreview();
-    }
-  });
-
+  // Confirmation dialog when switching slicing mode with existing work
   let isRevertingSlicingMode = false;
   watch(slicingMode, (newMode, oldMode) => {
     if (isRevertingSlicingMode) {
       isRevertingSlicingMode = false;
       return;
     }
-    const hasWorkInProgress = editorState.boxes.length > 0 || editorState.gridArea;
+    const hasWorkInProgress = imageEditor.boxes.length > 0 || imageEditor.gridArea;
     if (!hasWorkInProgress) {
-      editorState.clearBoxes();
+      imageEditor.clearBoxes();
       selectedBoxId.value = null;
-      editorState.clearGrid();
+      imageEditor.clearGrid();
       return;
     }
 
     ElMessageBox.confirm(
-      '切换分割模式将重置所有当前的选框或网格，确定要继续吗？',
-      '警告',
+      t('messages.switchModeConfirmMsg'),
+      t('messages.clearAllConfirmTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('messages.confirm'),
+        cancelButtonText: t('messages.cancel'),
         type: 'warning',
       }
     ).then(() => {
-      editorState.clearBoxes();
+      imageEditor.clearBoxes();
       selectedBoxId.value = null;
-      editorState.clearGrid();
+      imageEditor.clearGrid();
     }).catch(() => {
       isRevertingSlicingMode = true;
       slicingMode.value = oldMode;
     });
   });
 
-  watch([() => editorState.gridRows, () => editorState.gridCols], () => {
-    if (slicingMode.value === 'grid') draw();
-  });
-
-  const setupCanvas = (img: HTMLImageElement) => {
-    const canvas = canvasRef.value;
-    if (!canvas) return;
-    ctxRef.value = canvas.getContext('2d'); // Ensure context is set
-    canvas.width = img.width + canvasPadding.value * 2;
-    canvas.height = img.height + canvasPadding.value * 2;
-    canvas.style.width = `${canvas.width * (canvasZoom.value / 100)}px`;
-    canvas.style.height = `${canvas.height * (canvasZoom.value / 100)}px`;
-    draw(); // Draw immediately after setup
-  };
-
-  watch(canvasPadding, (newPadding) => {
-    if (editorState.sourceImage) setupCanvas(editorState.sourceImage);
-  });
-
-  watch(canvasZoom, (newZoom) => {
-    const canvas = canvasRef.value;
-    if (canvas && editorState.sourceImage) {
-      canvas.style.width = `${(editorState.sourceImage.width + canvasPadding.value * 2) * (newZoom / 100)}px`;
-      canvas.style.height = `${(editorState.sourceImage.height + canvasPadding.value * 2) * (newZoom / 100)}px`;
-    }
-  });
-
-  watch(autoDetectPadding, () => {
-    draw();
-  });
-
-  watch([() => editorState.selectionWidth, () => editorState.selectionHeight], () => {
-    draw();
-  });
-
-  // --- Event Handlers ---
-  const handleFileChange = async (uploadFile: UploadFile) => {
-    if (!uploadFile.raw || !uploadFile.raw.type.startsWith('image')) return;
-
-    const performLoad = async () => {
-      const img = await editorState.loadImage(uploadFile.raw!)
-      setupCanvas(img);
-      selectedBoxId.value = null;
-    };
-
-    if (editorState.sourceImage) {
-      ElMessageBox.confirm(t('messages.replaceConfirmMsg'), t('messages.replaceConfirmTitle'), {
-        confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
-      }).then(performLoad).catch(() => { });
-    } else {
-      performLoad();
-    }
-  };
-
-  const getBoxAt = (x: number, y: number): Box | null => {
-    for (let i = editorState.boxes.length - 1; i >= 0; i--) {
-      const box = editorState.boxes[i];
-      if (box.w > 0 && box.h > 0 && x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h) {
-        return box;
-      }
-    }
-    return null;
-  };
-
-  const getAnchorAt = (x: number, y: number, box: Box): string | null => {
-    const anchors = getAnchors(box);
-    for (const key in anchors) {
-      const anchor = anchors[key as keyof typeof anchors];
-      if (x >= anchor.x - ANCHOR_SIZE / 2 && x <= anchor.x + ANCHOR_SIZE / 2 && y >= anchor.y - ANCHOR_SIZE / 2 && y <= anchor.y + ANCHOR_SIZE / 2) {
-        return key;
-      }
-    }
-    return null;
-  };
-
-  const onMouseDown = (e: MouseEvent) => {
-    if (isMenuVisible.value) closeContextMenu();
-    e.preventDefault();
-    if (!canvasRef.value || !editorState.sourceImage) return;
-
-    const rect = canvasRef.value.getBoundingClientRect();
-    startX.value = (e.clientX - rect.left) / (canvasZoom.value / 100);
-    startY.value = (e.clientY - rect.top) / (canvasZoom.value / 100);
-
-    if (slicingMode.value === 'custom') {
-      const selectedBox = editorState.boxes.find(b => b.id === selectedBoxId.value);
-      if (selectedBox) {
-        const anchor = getAnchorAt(startX.value, startY.value, selectedBox);
-        if (anchor) {
-          isResizing.value = true;
-          activeAnchor.value = anchor;
-          originalAspectRatio.value = selectedBox.w / selectedBox.h;
-          return;
-        }
-      }
-
-      const clickedBox = getBoxAt(startX.value, startY.value);
-      if (clickedBox) {
-        selectedBoxId.value = clickedBox.id;
-        isMoving.value = true;
-        offsetX.value = startX.value - clickedBox.x;
-        offsetY.value = startY.value - clickedBox.y;
-      } else {
-        selectedBoxId.value = null;
-        isDrawing.value = true;
-        const newBox = editorState.addBox({ x: startX.value, y: startY.value, w: 0, h: 0 });
-        selectedBoxId.value = newBox.id;
-      }
-    } else if (slicingMode.value === 'grid') {
-      if (editorState.gridArea) {
-        const anchor = getAnchorAt(startX.value, startY.value, editorState.gridArea);
-        if (anchor) {
-          isResizing.value = true;
-          activeAnchor.value = anchor;
-          originalAspectRatio.value = editorState.gridArea.w / editorState.gridArea.h;
-          return;
-        }
-        if (startX.value >= editorState.gridArea.x && startX.value <= editorState.gridArea.x + editorState.gridArea.w &&
-          startY.value >= editorState.gridArea.y && startY.value <= editorState.gridArea.y + editorState.gridArea.h) {
-          isMoving.value = true;
-          offsetX.value = startX.value - editorState.gridArea.x;
-          offsetY.value = startY.value - editorState.gridArea.y;
-          return;
-        }
-      }
-      if (!editorState.gridArea) {
-        isDrawing.value = true;
-        editorState.gridArea = { id: Date.now(), x: startX.value, y: startY.value, w: 0, h: 0 };
-      }
-    }
-  };
-
-  const onMouseMove = (e: MouseEvent) => {
-    if (!canvasRef.value || !editorState.sourceImage) return;
-    const rect = canvasRef.value.getBoundingClientRect();
-    const currentX = (e.clientX - rect.left) / (canvasZoom.value / 100);
-    const currentY = (e.clientY - rect.top) / (canvasZoom.value / 100);
-
-    let targetBox: Box | null = null;
-    if (slicingMode.value === 'custom') {
-      targetBox = editorState.boxes.find(b => b.id === selectedBoxId.value) || null;
-    } else if (slicingMode.value === 'grid') {
-      targetBox = editorState.gridArea;
-    }
-
-    // Update cursor style
-    let cursor = 'default';
-    if (targetBox) {
-      const anchor = getAnchorAt(currentX, currentY, targetBox);
-      if (anchor) {
-        if (anchor === 'topLeft' || anchor === 'bottomRight') cursor = 'nwse-resize';
-        else if (anchor === 'topRight' || anchor === 'bottomLeft') cursor = 'nesw-resize';
-        else if (anchor === 'middleLeft' || anchor === 'middleRight') cursor = 'ew-resize';
-        else if (anchor === 'topMiddle' || anchor === 'bottomMiddle') cursor = 'ns-resize';
-      } else if (getBoxAt(currentX, currentY) || (slicingMode.value === 'grid' && targetBox && currentX >= targetBox.x && currentX <= targetBox.x + targetBox.w && currentY >= targetBox.y && currentY <= targetBox.y + targetBox.h)) {
-        cursor = 'move';
-      }
-    }
-    cursorStyle.value = cursor;
-
-    // Handle moving and resizing
-    if (isResizing.value && targetBox) {
-      const originalX = targetBox.x;
-      const originalY = targetBox.y;
-      const originalW = targetBox.w;
-      const originalH = targetBox.h;
-      let newX = targetBox.x, newY = targetBox.y, newW = targetBox.w, newH = targetBox.h;
-
-      if (e.shiftKey) {
-        // Update originalAspectRatio based on current box dimensions when Shift is pressed
-        originalAspectRatio.value = targetBox.w / targetBox.h;
-      }
-
-      switch (activeAnchor.value) {
-        case 'topLeft': {
-          newW = originalX + originalW - currentX;
-          newH = originalY + originalH - currentY;
-          if (e.shiftKey) {
-            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-              newH = newW / originalAspectRatio.value;
-            } else {
-              newW = newH * originalAspectRatio.value;
-            }
-          }
-          newX = originalX + originalW - newW;
-          newY = originalY + originalH - newH;
-          break;
-        }
-        case 'topRight': {
-          newW = currentX - originalX;
-          newH = originalY + originalH - currentY;
-          if (e.shiftKey) {
-            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-              newH = newW / originalAspectRatio.value;
-            } else {
-              newW = newH * originalAspectRatio.value;
-            }
-          }
-          newY = originalY + originalH - newH;
-          break;
-        }
-        case 'bottomLeft': {
-          newW = originalX + originalW - currentX;
-          newH = currentY - originalY;
-          if (e.shiftKey) {
-            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-              newH = newW / originalAspectRatio.value;
-            } else {
-              newW = newH * originalAspectRatio.value;
-            }
-          }
-          newX = originalX + originalW - newW;
-          break;
-        }
-        case 'bottomRight': {
-          newW = currentX - originalX;
-          newH = currentY - originalY;
-          if (e.shiftKey) {
-            if (Math.abs(newW / originalAspectRatio.value - newH) > Math.abs(newH * originalAspectRatio.value - newW)) {
-              newH = newW / originalAspectRatio.value;
-            } else {
-              newW = newH * originalAspectRatio.value;
-            }
-          }
-          break;
-        }
-        case 'topMiddle': { newY = currentY; newH = originalY + originalH - currentY; break; }
-        case 'bottomMiddle': { newH = currentY - originalY; break; }
-        case 'middleLeft': { newX = currentX; newW = originalX + originalW - currentX; break; }
-        case 'middleRight': { newW = currentX - originalX; break; }
-      }
-      if (newX < 0) { newW += newX; newX = 0; }
-      if (newY < 0) { newH += newY; newY = 0; }
-      if (newX + newW > canvasRef.value.width) { newW = canvasRef.value.width - newX; }
-      if (newY + newH > canvasRef.value.height) { newH = canvasRef.value.height - newY; }
-      targetBox.x = newX; targetBox.y = newY; targetBox.w = newW; targetBox.h = newH;
-    } else if (isMoving.value && targetBox) {
-      let newX = currentX - offsetX.value;
-      let newY = currentY - offsetY.value;
-      newX = Math.max(0, Math.min(newX, canvasRef.value.width - targetBox.w));
-      newY = Math.max(0, Math.min(newY, canvasRef.value.height - targetBox.h));
-      targetBox.x = newX;
-      targetBox.y = newY;
-    } else if (isDrawing.value) {
-      const boxToDraw = slicingMode.value === 'custom' ? editorState.boxes[editorState.boxes.length - 1] : editorState.gridArea;
-      if (boxToDraw) {
-        boxToDraw.w = currentX - startX.value;
-        boxToDraw.h = currentY - startY.value;
-      }
-    }
-  };
-
-  const onMouseUp = () => {
-    if (!editorState.sourceImage) return;
-    let subjectBox: Box | null = null;
-    if (slicingMode.value === 'custom' && (isDrawing.value || isResizing.value)) {
-      subjectBox = editorState.boxes.find(b => b.id === selectedBoxId.value) || null;
-    } else if (slicingMode.value === 'grid' && (isDrawing.value || isResizing.value)) {
-      subjectBox = editorState.gridArea;
-    }
-
-    if (subjectBox) {
-      if (subjectBox.w < 0) { subjectBox.x += subjectBox.w; subjectBox.w = -subjectBox.w; }
-      if (subjectBox.h < 0) { subjectBox.y += subjectBox.h; subjectBox.h = -subjectBox.h; }
-      if (subjectBox.w < 5 || subjectBox.h < 5) {
-        if (slicingMode.value === 'custom') {
-          if (isDrawing.value) editorState.deleteBox(subjectBox.id);
-          selectedBoxId.value = null;
-        } else {
-          editorState.clearGrid();
-        }
-      }
-    }
-
-    isDrawing.value = false;
-    isMoving.value = false;
-    isResizing.value = false;
-    activeAnchor.value = null;
-  };
-
-  const onMouseLeave = () => {
-    if (isDrawing.value || isMoving.value || isResizing.value) onMouseUp();
-  };
-
-  const onRightClick = async (e: MouseEvent) => {
-    if (slicingMode.value === 'grid') return;
-    if (!canvasRef.value || !editorState.sourceImage) return;
-
-    const rect = canvasRef.value.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / (canvasZoom.value / 100);
-    const y = (e.clientY - rect.top) / (canvasZoom.value / 100);
-
-    const clickedBox = getBoxAt(x, y);
-
-    if (clickedBox) {
-      rightClickedBoxId.value = clickedBox.id;
-      menuTop.value = e.clientY;
-      menuLeft.value = e.clientX;
-      isMenuVisible.value = true;
-      await nextTick();
-      dropdownRef.value?.handleOpen();
-    }
-  };
-
-  const closeContextMenu = () => { isMenuVisible.value = false; };
-
-  const handleVisibleChange = (visible: boolean) => { if (!visible) closeContextMenu(); };
-
-  const handleCommand = (command: string) => {
-    if (rightClickedBoxId.value === null) return;
-    if (command === 'deleteBox') {
-      if (selectedBoxId.value === rightClickedBoxId.value) selectedBoxId.value = null;
-      editorState.deleteBox(rightClickedBoxId.value);
-    }
-    closeContextMenu();
-  };
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (!editorState.sourceImage) return;
-
-    // Handle Delete and Backspace
-    if (e.key === 'Delete' || e.key === 'Backspace') {
-      if (slicingMode.value === 'grid' && editorState.gridArea) {
-        e.preventDefault();
-        editorState.clearGrid();
-      } else if (slicingMode.value === 'custom' && selectedBoxId.value !== null) {
-        e.preventDefault();
-        editorState.deleteBox(selectedBoxId.value);
-        selectedBoxId.value = null;
-      }
-    }
-
-    // Handle Arrow Key movement
-    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-    if (arrowKeys.includes(e.key)) {
-      let targetBox: Box | null = null;
-      if (slicingMode.value === 'custom' && selectedBoxId.value !== null) {
-        targetBox = editorState.boxes.find(b => b.id === selectedBoxId.value) || null;
-      } else if (slicingMode.value === 'grid' && editorState.gridArea) {
-        targetBox = editorState.gridArea;
-      }
-
-      if (targetBox) {
-        e.preventDefault();
-        const moveAmount = e.shiftKey ? 10 : 1;
-
-        switch (e.key) {
-          case 'ArrowUp':
-            targetBox.y -= moveAmount;
-            break;
-          case 'ArrowDown':
-            targetBox.y += moveAmount;
-            break;
-          case 'ArrowLeft':
-            targetBox.x -= moveAmount;
-            break;
-          case 'ArrowRight':
-            targetBox.x += moveAmount;
-            break;
-        }
-      }
-    }
-  };
-
   const handleClearAll = () => {
-    if (slicingMode.value === 'custom') {
-      if (editorState.boxes.length === 0) return;
-      ElMessageBox.confirm(t('messages.clearAllConfirmMsg'), t('messages.clearAllConfirmTitle'), {
-        confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning',
-      }).then(() => {
-        editorState.clearBoxes();
-        selectedBoxId.value = null;
-      }).catch(() => { });
-    } else if (slicingMode.value === 'grid') {
-      editorState.clearGrid();
-    }
+    if (imageEditor.boxes.length === 0 && !imageEditor.gridArea) return;
+
+    ElMessageBox.confirm(t('messages.clearAllConfirmMsg'), t('messages.clearAllConfirmTitle'), {
+      confirmButtonText: t('messages.confirm'),
+      cancelButtonText: t('messages.cancel'),
+      type: 'warning',
+    }).then(() => {
+      imageEditor.clearBoxes();
+      selectedBoxId.value = null;
+      imageEditor.clearGrid();
+    }).catch(() => {});
   };
-
-  const reapplyAutoDetect = () => {
-    const canvas = canvasRef.value;
-    if (!canvas || !editorState.sourceImage) return;
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) return;
-    tempCanvas.width = editorState.sourceImage.width;
-    tempCanvas.height = editorState.sourceImage.height;
-    tempCtx.drawImage(editorState.sourceImage, 0, 0);
-    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-
-    if (autoDetectMode.value === 'padding') {
-      editorState.autoDetect(imageData, autoDetectPadding.value, canvasPadding.value);
-    } else if (autoDetectMode.value === 'fixedSize') {
-      const shouldSetFixedSize = editorState.selectionWidth == null || editorState.selectionHeight == null;
-      editorState.autoDetect(imageData, 0, canvasPadding.value, shouldSetFixedSize);
-    }
-  };
-
-  const handleAutoDetect = () => {
-    reapplyAutoDetect();
-    selectedBoxId.value = null;
-  };
-
-  watch(autoDetectPadding, () => {
-    if (autoDetectMode.value === 'padding') {
-      reapplyAutoDetect();
-    }
-  });
-
-  // save last selection width and height for fixed size mode
-  let lastSelectionWidth: number | undefined;
-  let lastSelectionHeight: number | undefined;
-  watch(autoDetectMode, (newMode, oldMode) => {
-    if (newMode === 'padding') {
-      lastSelectionWidth = editorState.selectionWidth;
-      lastSelectionHeight = editorState.selectionHeight;
-      editorState.selectionWidth = undefined;
-      editorState.selectionHeight = undefined;
-    }
-    else if (newMode === 'fixedSize') {
-      editorState.selectionWidth = lastSelectionWidth;
-      editorState.selectionHeight = lastSelectionHeight;
-    }
-    // Only reapply auto-detect if the mode actually changed and it's not the initial setup
-    if (newMode !== oldMode) {
-      reapplyAutoDetect();
-    }
-  });
-
-  watch([() => editorState.selectionWidth, () => editorState.selectionHeight], (newValues) => {
-    const [newWidth, newHeight] = newValues;
-    if (newWidth === null) {
-      editorState.selectionWidth = undefined;
-    }
-    if (newHeight === null) {
-      editorState.selectionHeight = undefined;
-    }
-    if (autoDetectMode.value === 'fixedSize') {
-      reapplyAutoDetect();
-    }
-  });
-
-  const handleExport = async () => {
-    try {
-      const zipBlob = await editorState.export(exportPrefix.value, exportConnector.value, slicingMode.value, canvasPadding.value);
-      const a = document.createElement('a');
-      const url = URL.createObjectURL(zipBlob);
-      a.href = url;
-      a.download = `${exportPrefix.value}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error: any) {
-      ElMessageBox.alert(error.message, t('messages.exportErrorTitle'), { type: 'error' });
-    }
-  };
-
-  const onCanvasPlaceholderClick = () => fileInputRef.value?.click();
-  const onFileSelected = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    if (target.files && target.files[0]) handleFileChange({ raw: target.files[0] } as UploadFile);
-  };
-  const onDrop = (e: DragEvent) => {
-    if (e.dataTransfer?.files && e.dataTransfer.files[0]) handleFileChange({ raw: e.dataTransfer.files[0] } as UploadFile);
-  };
-
-  // --- Lifecycle Hooks ---
-  onMounted(() => {
-    const canvas = canvasRef.value;
-    if (canvas) ctxRef.value = canvas.getContext('2d');
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('click', closeContextMenu);
-  });
-
-  onUnmounted(() => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('click', closeContextMenu);
-  });
 
   return {
-    // Refs to bind in template
+    // Template Refs
     canvasRef,
     previewCanvasRef,
-    fileInputRef,
     dropdownRef,
 
-    // UI State
-    cursorStyle,
-    slicingMode,
-    canvasZoom,
-    canvasPadding,
-    autoDetectPadding,
-    exportPrefix,
-    exportConnector,
+    // State (from useCanvasState, exposing to the template)
+    ...state,
+    ...toRefs(imageEditor),
+
+    // Computed
+    fileNamePreview,
+
+    // Context Menu State
     isMenuVisible,
     menuTop,
     menuLeft,
-    autoDetectMode,
-
-    // Computed State
-    fileNamePreview,
-
-    // Core state (making it available to the view)
-    editorState,
-    ...toRefs(editorState),
-    selectedBoxId,
 
     // UI Action Handlers
     handleFileChange,
-    onCanvasPlaceholderClick,
-    onFileSelected,
     onDrop,
     onMouseDown,
     onMouseMove,
@@ -742,7 +137,9 @@ export function useImageEditor(t: (key: string) => string) {
     handleClearAll,
     handleAutoDetect,
     handleExport,
-    fitGridToImage: () => editorState.fitGridToImage(canvasPadding.value),
-    clearGrid: editorState.clearGrid,
+    fitGridToImage: () => imageEditor.fitGridToImage(canvasPadding.value),
+    clearGrid: imageEditor.clearGrid,
   };
 }
+
+export type UseImageEditorReturn = ReturnType<typeof useImageEditor>;
