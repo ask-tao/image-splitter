@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -3 242 38">
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Roboto Slab';
+        font-style: normal;
+        font-weight: 700;
+        src: url(https://fonts.gstatic.com/s/robotoslab/v16/BngbUXZYTXPIvIqcwcegUL-A-g--wtU.woff2) format('woff2');
+      }
+    </style>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#41D1FF" />
+      <stop offset="100%" stop-color="#BD34FE" />
+    </linearGradient>
+  </defs>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font-family: 'Roboto Slab', serif; font-size: 42px; font-weight: 700; fill: url(#titleGrad);">
+    Image Splitter
+  </text>
+</svg>

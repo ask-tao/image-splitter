@@ -407,9 +407,12 @@ html:not(.dark) .app-header .github-link:hover {
   margin: 0;
   font-size: 20px;
   white-space: nowrap;
-  color: var(--el-color-white);
   font-family: 'Roboto Slab', serif;
   font-weight: 700;
+  background: linear-gradient(to bottom right, #41D1FF, #BD34FE);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header-title-group {

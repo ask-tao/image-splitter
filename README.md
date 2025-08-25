@@ -2,9 +2,11 @@
 
 [![doocs-md](icon/logo.svg)](https://github.com/ask-tao/image-splitter)
 
-</div>
+<a href="https://github.com/ask-tao/image-splitter" target="_blank" rel="noopener noreferrer">
+  <img src="doc/image/title.svg" alt="Image Splitter" style="width: 200px;"/>
+</a>
 
-<h1 align="center" style="font-family: 'Roboto Slab', serif;">Image Splitter</h1>
+</div>
 
 <div align="center">
 
