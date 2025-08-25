@@ -1,6 +1,6 @@
 {
   "name": "image-splitter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A tool to split image.",
   "productName": "Image Splitter",
   "main": "dist-electron/main.js",

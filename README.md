@@ -8,7 +8,7 @@
 
 <div align="center">
 
-![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white) ![Element Plus](https://img.shields.io/badge/Element--Plus-409EFF?logo=element-plus&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite&logoColor=white)  ![Node.js](https://img.shields.io/badge/Node.js-16.x%2B-brightgreen) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white) ![Element Plus](https://img.shields.io/badge/Element--Plus-409EFF?logo=element-plus&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite&logoColor=white) ![Electron](https://img.shields.io/badge/Electron-2B2E3A?logo=electron&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-16.x%2B-brightgreen) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 
 </div>
 
@@ -55,10 +55,11 @@
 
 本工具主要采用现代前端技术栈构建，核心原理围绕 `Canvas` 的像素级操作和图像处理算法。
 
-- **核心框架**: **Vue 3 + Vite + TypeScript**
+- **核心框架**: **Vue 3 + Vite + TypeScript + Electron**
   - **Vue 3**: 利用其强大的响应式系统来管理选框列表、配置项等复杂状态，并通过组件化的方式构建 UI。
   - **Vite**: 提供极速的开发服务器和高效的构建能力。
   - **TypeScript**: 为项目提供了类型安全，增强了代码的可维护性。
+  - **Electron**: 用于将Web应用打包成跨平台的桌面应用，实现了原生集成和离线使用的能力。
 
 - **UI 库**: **Element Plus**
   - 提供了一套高质量的 Vue 3 组件，用于快速构建布局、表单、按钮、对话框等界面元素。
