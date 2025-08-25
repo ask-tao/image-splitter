@@ -2,21 +2,23 @@
   <el-config-provider :locale="currentLocale">
     <el-container class="app-container">
       <el-header class="app-header">
-        <div class="header-title-group">
-          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="header-logo">
-            <defs>
-              <linearGradient id="globalGrad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#41D1FF"></stop>
-                <stop offset="100%" stop-color="#BD34FE"></stop>
-              </linearGradient>
-            </defs>
-            <rect x="0" y="0" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
-            <rect x="102" y="0" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
-            <rect x="0" y="102" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
-            <rect x="102" y="102" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
-          </svg>
-          <h1>{{ $t('header.title') }}</h1>
-        </div>
+        <a href="https://github.com/ask-tao/image-splitter" target="_blank" rel="noopener noreferrer" class="header-title-link">
+          <div class="header-title-group">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="header-logo">
+              <defs>
+                <linearGradient id="globalGrad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#41D1FF"></stop>
+                  <stop offset="100%" stop-color="#BD34FE"></stop>
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+              <rect x="102" y="0" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+              <rect x="0" y="102" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+              <rect x="102" y="102" width="98" height="98" rx="10" ry="10" fill="url(#globalGrad)"/>
+            </svg>
+            <h1>{{ $t('header.title') }}</h1>
+          </div>
+        </a>
         <div class="header-actions">
           <el-tooltip :content="$t('header.help')" placement="bottom">
             <span class="header-action-icon" @click="helpDialogVisible = true">
@@ -414,6 +416,11 @@ html:not(.dark) .app-header .github-link:hover {
   display: flex;
   align-items: center;
   overflow: hidden;
+}
+
+.header-title-link {
+  text-decoration: none;
+  color: inherit;
 }
 
 .header-logo {
